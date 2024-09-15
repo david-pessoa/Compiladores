@@ -48,3 +48,45 @@
 //7) Interação com o sistema de arquivos
 //8) Controle da numeração de linhas do programa fonte
 
+int main(int argc, char *argv[])
+{
+    char* nome_arq = argv[1]; //executar como: ./compilador entrada.txt
+
+    FILE *file;
+    char *buffer;
+    long file_size;
+
+    // Abra o arquivo em modo de leitura
+    file = fopen(nome_arq, "r");
+
+    if (file == NULL) {
+        perror("Erro ao abrir o arquivo");
+        return 1;
+    }
+
+    // Mova o ponteiro para o final do arquivo e obtenha o tamanho
+    fseek(file, 0, SEEK_END);
+    file_size = ftell(file);
+    rewind(file);  // Volta para o início do arquivo
+
+    // Aloca memória suficiente para armazenar o conteúdo
+    buffer = (char *)malloc(file_size + 1); // +1 para o terminador nulo '\0'
+    
+    if (buffer == NULL) {
+        perror("Erro ao alocar memória");
+        fclose(file);
+        return 1;
+    }
+
+    // Lê o conteúdo do arquivo e coloca na string `buffer`
+    fread(buffer, 1, file_size, file);
+    buffer[file_size] = '\0'; // Adiciona o terminador nulo ao final da string
+
+    
+
+    // Libera memória e fecha o arquivo
+    free(buffer);
+    fclose(file);
+
+    return 0;
+}

@@ -73,6 +73,36 @@ char *msgAtomo[] = {
 
 int conta_linha = 1; // conta as linhas do arquivo
 
+
+// IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO )*
+InfoAtomo reconhece_identificador(char *buffer){
+    int tamanho = 1;
+    InfoAtomo info_atomo;
+    info_atomo.atomo = ERRO;
+    char *iniID = buffer;
+    // ja temos uma letra minuscula
+    buffer++;
+
+q1:
+    if( islower(*buffer) || isdigit(*buffer)){
+        buffer++;
+        goto q1;
+    }
+    if( isupper(*buffer))
+        return info_atomo;
+
+    //"  var1@"
+    if(tamanho > 15) // se for maior eh erro lexico
+    {
+        return info_atomo;
+    }
+    
+    strncpy(info_atomo.atributo_ID,iniID,buffer-iniID);
+    info_atomo.atributo_ID[buffer-iniID] = 0; // finaliza a string
+    info_atomo.atomo = IDENTIFICADOR;
+    return info_atomo;
+}
+
 InfoAtomo obter_atomo(char *buffer){
     InfoAtomo info_atomo;
 
@@ -94,30 +124,6 @@ InfoAtomo obter_atomo(char *buffer){
     return info_atomo;
 
 }
-// IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO )*
-InfoAtomo reconhece_identificador(char *buffer){
-    InfoAtomo info_atomo;
-    info_atomo.atomo = ERRO;
-    char *iniID = buffer;
-    // ja temos uma letra minuscula
-    buffer++;
-
-q1:
-    if( islower(*buffer) || isdigit(*buffer)){
-        buffer++;
-        goto q1;
-    }
-    if( isupper(*buffer))
-        return info_atomo;
-
-    //"  var1@"
-    // falta testar o tamanho do identificador que dever ser menor que 15,
-    // se for maior eh erro lexico
-    strncpy(info_atomo.atributo_ID,iniID,buffer-iniID);
-    info_atomo.atributo_ID[buffer-iniID] = 0; // finaliza a string
-    info_atomo.atomo = IDENTIFICADOR;
-    return info_atomo;
-}
 
 char* le_arquivo(char* nome_arq)
 {
@@ -130,7 +136,7 @@ char* le_arquivo(char* nome_arq)
 
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
-        return 1;
+        return NULL;
     }
 
     // Mova o ponteiro para o final do arquivo e obtenha o tamanho
@@ -144,7 +150,7 @@ char* le_arquivo(char* nome_arq)
     if (buffer == NULL) {
         perror("Erro ao alocar memória");
         fclose(file);
-        return 1;
+        return NULL;
     }
 
     // Lê o conteúdo do arquivo e coloca na string `buffer`
@@ -159,18 +165,22 @@ char* le_arquivo(char* nome_arq)
 
 int main(int argc, char *argv[])
 {
-    char* nome_arq = argv[1]; //executar como: ./compilador entrada.txt
-    char* buffer = le_arquivo(nome_arq);
-    
+    //char* buffer = le_arquivo(argv[1]); //executar como: ./compilador entrada.txt
 
-    obter_atomo(buffer);
+    //Exemplo
+    char *buffer = "     var111@\n" 
+               " \r var2 \t \n\n\n\n"
+               " vaa3  ";
 
     InfoAtomo info_atomo;
     do{
         // falta implementar o reconhecimento do atomo NUMERO
         info_atomo = obter_atomo(buffer);
         if( info_atomo.atomo == IDENTIFICADOR)
+        {
             printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
+
+        }
         else
             printf("%03d# %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo]);
 

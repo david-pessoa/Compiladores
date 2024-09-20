@@ -3,13 +3,33 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 typedef enum{ //tipo dos átomos
     IDENTIFICADOR,
     NUMERO,
     ERRO,
     EOF_BUFFER,
-    COMENTARIO
+    COMENTARIO,
+
+    AND, //Palavras reservadas da linguagem
+    BEGIN,
+    BOOLEAN,
+    ELIF,
+    END,
+    FALSE,
+    FOR,
+    IF,
+    INTEGER,
+    NOT,
+    OF,
+    OR,
+    PROGRAM,
+    READ,
+    SET,
+    TO,
+    TRUE,
+    WRITE
 }Atomo;
 
 typedef struct{
@@ -24,7 +44,26 @@ char *msgAtomo[] = {
     "NUMERO",
     "ERRO",
     "EOF_BUFFER",
-    "COMENTARIO"
+    "COMENTARIO",
+
+    "AND", //Palavras reservadas da linguagem
+    "BEGIN",
+    "BOOLEAN",
+    "ELIF",
+    "END",
+    "FALSE",
+    "FOR",
+    "IF",
+    "INTEGER",
+    "NOT",
+    "OF",
+    "OR",
+    "PROGRAM",
+    "READ",
+    "SET",
+    "TO",
+    "TRUE",
+    "WRITE"
 };
 
 //Só existem tipo bool e int
@@ -64,7 +103,7 @@ char *msgAtomo[] = {
 //FUNÇÕES DO LÉXICO:
 //1) Extração e classificação de átomos
 //2) Eliminação de delimitadores e comentários ✅
-//3) Conversão numérica
+//3) Conversão numérica ✅
 //4) Identificação de palavras reservadas
 //5) Tratamento de identificadores
 //6) Recuperação de erros
@@ -79,11 +118,13 @@ InfoAtomo reconhece_numero()
     InfoAtomo info_atomo;
     buffer += 2;
     info_atomo.linha = conta_linha;
-    char *string_num;
+    char string_num[20] = "";
+    int num = 0;
 
     while(*buffer == '0' || *buffer == '1')
     {    
-        strcat(string_num, *buffer);
+        strncat(string_num, buffer, 1);
+        buffer++;
     }
 
     if(*buffer != '\n' && *buffer != '\0' && *buffer != ' ')
@@ -98,10 +139,10 @@ InfoAtomo reconhece_numero()
     for (int i = 0; i < tamanho; i++) {
         if (string_num[i] == '1') {
             // Calcula 2 elevado à posição (da direita para a esquerda)
-            info_atomo.numero += pow(2, tamanho - 1 - i);
+            num += pow(2, tamanho - 1 - i);
         }
     }
-
+    info_atomo.numero = num;
     info_atomo.atomo = NUMERO;
     return info_atomo;
 }
@@ -153,40 +194,171 @@ InfoAtomo ignora_comentario()
 }
 
 
-// IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO )*
+// IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO | _ )*
 InfoAtomo reconhece_identificador(){
     int tamanho = 1;
     InfoAtomo info_atomo;
     info_atomo.atomo = ERRO;
     char *iniID = buffer;
+    char string[16] = ""; //armazena palavra para verificar se é palavra reservada
+    
+    strncat(string, buffer, 1);
     // ja temos uma letra minuscula
     buffer++;
 
     //reconhecer as palavras reservadas
 
 q1:
-    if( islower(*buffer) || isdigit(*buffer)){
+    if(islower(*buffer) || isdigit(*buffer || *buffer != '_')){
+        strncat(string, buffer, 1);
         buffer++;
         goto q1;
     }
-    if( isupper(*buffer))
+    if(isupper(*buffer) && !isdigit(*buffer) && *buffer != '_')
         return info_atomo;
 
-    //"  var1@"
     if(tamanho > 15) // se for maior eh erro lexico
     {
         return info_atomo;
     }
     
-    strncpy(info_atomo.atributo_ID,iniID,buffer-iniID);
-    info_atomo.atributo_ID[buffer-iniID] = 0; // finaliza a string
-    info_atomo.atomo = IDENTIFICADOR;
-    return info_atomo;
+    if(strcmp("and", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = AND;
+        return info_atomo;
+    }
+
+    else if(strcmp("begin", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = BEGIN;
+        return info_atomo;
+    }
+
+    else if(strcmp("boolean", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = BOOLEAN;
+        return info_atomo;
+    }
+
+    else if(strcmp("elif", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = ELIF;
+        return info_atomo;
+    }
+
+    else if(strcmp("end", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = END;
+        return info_atomo;
+    }
+
+    else if(strcmp("false", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = FALSE;
+        return info_atomo;
+    }
+
+    else if(strcmp("for", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = FOR;
+        return info_atomo;
+    }
+
+    else if(strcmp("if", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = IF;
+        return info_atomo;
+    }
+
+    else if(strcmp("integer", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = INTEGER;
+        return info_atomo;
+    }
+
+    else if(strcmp("not", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = NOT;
+        return info_atomo;
+    }
+
+    else if(strcmp("of", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = OF;
+        return info_atomo;
+    }
+
+    else if(strcmp("or", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = OR;
+        return info_atomo;
+    }
+
+    else if(strcmp("program", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = PROGRAM;
+        return info_atomo;
+    }
+
+    else if(strcmp("read", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = READ;
+        return info_atomo;
+    }
+
+    else if(strcmp("set", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = SET;
+        return info_atomo;
+    }
+
+    else if(strcmp("to", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = TO;
+        return info_atomo;
+    }
+
+    else if(strcmp("true", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = TRUE;
+        return info_atomo;
+    }
+
+    else if(strcmp("write", string) == 0)
+    {
+        strcpy(info_atomo.atributo_ID, string);
+        info_atomo.atomo = WRITE;
+        return info_atomo;
+    }
+
+    else
+    {
+        strncpy(info_atomo.atributo_ID,iniID,buffer-iniID);
+        info_atomo.atributo_ID[buffer-iniID] = 0; // finaliza a string
+        info_atomo.atomo = IDENTIFICADOR;
+        return info_atomo;
+    }
 }
 
 InfoAtomo obter_atomo(){
     InfoAtomo info_atomo;
-    char anterior;
 
     // consome espaços em branco quebra de linhas tabulação e retorno de carro
     while(*buffer == ' ' || *buffer == '\n' || *buffer == '\t' ||*buffer == '\r'){
@@ -264,7 +436,7 @@ int main(int argc, char *argv[])
     //char* buffer = le_arquivo(argv[1]); //executar como: ./compilador entrada.txt
 
     //Exemplo
-    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101    var1\n"
+    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101  false  var1\n"
                     " \r var2 \t \n\n\n\n"
                     " vaa3  ";
     buffer = malloc(strlen(string) + 1);
@@ -277,7 +449,10 @@ int main(int argc, char *argv[])
         if( info_atomo.atomo == IDENTIFICADOR)
         {
             printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
-
+        }
+        else if (info_atomo.atomo == NUMERO) 
+        {
+            printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
         }
         else
             printf("%03d# %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo]);

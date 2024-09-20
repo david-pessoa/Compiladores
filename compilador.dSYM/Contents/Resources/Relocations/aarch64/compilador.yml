@@ -2,13 +2,15 @@
 triple:          'arm64-apple-darwin'
 binary-path:     compilador
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _ignora_comentario_multiplas_linhas, symObjAddr: 0x0, symBinAddr: 0x100003984, symSize: 0x90 }
-  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _msgAtomo, symObjAddr: 0x578, symBinAddr: 0x100008000, symSize: 0x0 }
-  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _conta_linha, symObjAddr: 0x5A0, symBinAddr: 0x100008028, symSize: 0x0 }
-  - { offsetInCU: 0x8F, offset: 0x8F, size: 0x8, addend: 0x0, symName: _buffer, symBinAddr: 0x100008030, symSize: 0x0 }
-  - { offsetInCU: 0xC7, offset: 0xC7, size: 0x8, addend: 0x0, symName: _ignora_comentario_multiplas_linhas, symObjAddr: 0x0, symBinAddr: 0x100003984, symSize: 0x90 }
-  - { offsetInCU: 0x14B, offset: 0x14B, size: 0x8, addend: 0x0, symName: _reconhece_identificador, symObjAddr: 0x90, symBinAddr: 0x100003A14, symSize: 0xE4 }
-  - { offsetInCU: 0x289, offset: 0x289, size: 0x8, addend: 0x0, symName: _obter_atomo, symObjAddr: 0x174, symBinAddr: 0x100003AF8, symSize: 0x158 }
-  - { offsetInCU: 0x324, offset: 0x324, size: 0x8, addend: 0x0, symName: _le_arquivo, symObjAddr: 0x2CC, symBinAddr: 0x100003C50, symSize: 0xAC }
-  - { offsetInCU: 0x635, offset: 0x635, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x378, symBinAddr: 0x100003CFC, symSize: 0x11C }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x100003120, symSize: 0x148 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _msgAtomo, symObjAddr: 0xDA0, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _conta_linha, symObjAddr: 0xE58, symBinAddr: 0x1000080B8, symSize: 0x0 }
+  - { offsetInCU: 0x8F, offset: 0x8F, size: 0x8, addend: 0x0, symName: _buffer, symBinAddr: 0x1000080C0, symSize: 0x0 }
+  - { offsetInCU: 0x133, offset: 0x133, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x100003120, symSize: 0x148 }
+  - { offsetInCU: 0x181, offset: 0x181, size: 0x8, addend: 0x0, symName: _ignora_comentario_multiplas_linhas, symObjAddr: 0x148, symBinAddr: 0x100003268, symSize: 0x90 }
+  - { offsetInCU: 0x19E, offset: 0x19E, size: 0x8, addend: 0x0, symName: _ignora_comentario, symObjAddr: 0x1D8, symBinAddr: 0x1000032F8, symSize: 0x68 }
+  - { offsetInCU: 0x222, offset: 0x222, size: 0x8, addend: 0x0, symName: _reconhece_identificador, symObjAddr: 0x240, symBinAddr: 0x100003360, symSize: 0x4B4 }
+  - { offsetInCU: 0x3D2, offset: 0x3D2, size: 0x8, addend: 0x0, symName: _obter_atomo, symObjAddr: 0x6F4, symBinAddr: 0x100003814, symSize: 0x2EC }
+  - { offsetInCU: 0x4D5, offset: 0x4D5, size: 0x8, addend: 0x0, symName: _le_arquivo, symObjAddr: 0x9E0, symBinAddr: 0x100003B00, symSize: 0xAC }
+  - { offsetInCU: 0x7EB, offset: 0x7EB, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0xA8C, symBinAddr: 0x100003BAC, symSize: 0x160 }
 ...

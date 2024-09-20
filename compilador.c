@@ -98,6 +98,27 @@ InfoAtomo ignora_comentario_multiplas_linhas() //Ignora múltiplas linhas de com
 }
 
 // Função para ignorar uma linha de comentário #
+InfoAtomo ignora_comentario()
+{
+    InfoAtomo info_atomo;
+    buffer++;
+    info_atomo.linha = conta_linha;
+    while(*buffer != '\n')
+    {
+        buffer++;
+        
+        if(*buffer == '\0' || *buffer == 0)
+        {
+            info_atomo.atomo = EOF_BUFFER;
+            info_atomo.linha = conta_linha;
+            return info_atomo;
+        }
+    }
+    conta_linha++;
+    info_atomo.atomo = COMENTARIO;
+    buffer++;
+    return info_atomo;
+}
 
 
 // IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO )*
@@ -142,17 +163,20 @@ InfoAtomo obter_atomo(){
     // reconhece identificador
     if( islower(*buffer)){ // ser for letra mininuscula
         info_atomo = reconhece_identificador();
-    }else if(*buffer == 0){
+    }else if(*buffer == 0){ // Se chegar ao fim do arquivo
         info_atomo.atomo = EOF_BUFFER;
     }else{
-        info_atomo.atomo = ERRO;
+        info_atomo.atomo = ERRO; //Se encontrar qualquer outro caractere
     }
     info_atomo.linha = conta_linha;
 
-    if(*buffer == '{' && *(buffer + 1) == '-')
+    if(*buffer == '{' && *(buffer + 1) == '-') //Se encontra comentário de múltiplas linhas
     {
         info_atomo = ignora_comentario_multiplas_linhas();
     }
+
+    if(*buffer == '#')
+        info_atomo = ignora_comentario();
     
     return info_atomo;
 

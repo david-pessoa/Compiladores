@@ -15,8 +15,8 @@ typedef enum{ //tipo dos átomos
 typedef struct{
     Atomo atomo;
     int linha;
-    float atributo_numero;
     char atributo_ID[16];
+    int numero;
 }InfoAtomo;
 
 char *msgAtomo[] = {
@@ -63,16 +63,48 @@ char *msgAtomo[] = {
 
 //FUNÇÕES DO LÉXICO:
 //1) Extração e classificação de átomos
-//2) Eliminação de delimitadores e comentários
+//2) Eliminação de delimitadores e comentários ✅
 //3) Conversão numérica
 //4) Identificação de palavras reservadas
 //5) Tratamento de identificadores
 //6) Recuperação de erros
 //7) Interação com o sistema de arquivos
-//8) Controle da numeração de linhas do programa fonte
+//8) Controle da numeração de linhas do programa fonte 
 
 int conta_linha = 1; // conta as linhas do arquivo
 char *buffer;
+
+InfoAtomo reconhece_numero()
+{
+    InfoAtomo info_atomo;
+    buffer += 2;
+    info_atomo.linha = conta_linha;
+    char *string_num;
+
+    while(*buffer == '0' || *buffer == '1')
+    {    
+        strcat(string_num, *buffer);
+    }
+
+    if(*buffer != '\n' && *buffer != '\0' && *buffer != ' ')
+    {
+        info_atomo.atomo = ERRO;
+        return info_atomo;
+    }
+
+    int tamanho = strlen(string_num);
+
+    // Percorre cada caractere da string de binário
+    for (int i = 0; i < tamanho; i++) {
+        if (string_num[i] == '1') {
+            // Calcula 2 elevado à posição (da direita para a esquerda)
+            info_atomo.numero += pow(2, tamanho - 1 - i);
+        }
+    }
+
+    info_atomo.atomo = NUMERO;
+    return info_atomo;
+}
 
 InfoAtomo ignora_comentario_multiplas_linhas() //Ignora múltiplas linhas de comentário
 {
@@ -130,6 +162,8 @@ InfoAtomo reconhece_identificador(){
     // ja temos uma letra minuscula
     buffer++;
 
+    //reconhecer as palavras reservadas
+
 q1:
     if( islower(*buffer) || isdigit(*buffer)){
         buffer++;
@@ -169,6 +203,11 @@ InfoAtomo obter_atomo(){
         info_atomo.atomo = ERRO; //Se encontrar qualquer outro caractere
     }
     info_atomo.linha = conta_linha;
+
+    if(*buffer == '0' && *(buffer + 1) == 'b') //Reconhece número
+    {
+        info_atomo = reconhece_numero();
+    }
 
     if(*buffer == '{' && *(buffer + 1) == '-') //Se encontra comentário de múltiplas linhas
     {
@@ -225,7 +264,7 @@ int main(int argc, char *argv[])
     //char* buffer = le_arquivo(argv[1]); //executar como: ./compilador entrada.txt
 
     //Exemplo
-    char *string = "{- Olá,\n Mundo\n Cruel! -}     var1\n"
+    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101    var1\n"
                     " \r var2 \t \n\n\n\n"
                     " vaa3  ";
     buffer = malloc(strlen(string) + 1);

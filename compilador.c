@@ -72,10 +72,36 @@ char *msgAtomo[] = {
 //8) Controle da numeração de linhas do programa fonte
 
 int conta_linha = 1; // conta as linhas do arquivo
+char *buffer;
+
+InfoAtomo ignora_comentario_multiplas_linhas() //Ignora múltiplas linhas de comentário
+{
+    InfoAtomo info_atomo;
+    buffer += 2;
+    info_atomo.linha = conta_linha;
+    while(!(*buffer == '-' && *(buffer + 1) == '}'))
+    {
+        buffer++;
+        if( *buffer =='\n')
+            conta_linha++;
+        
+        if(*buffer == '\0' || *buffer == 0)
+        {
+            info_atomo.atomo = ERRO;
+            info_atomo.linha = conta_linha;
+            return info_atomo;
+        }
+    }
+    info_atomo.atomo = COMENTARIO;
+    buffer += 2;
+    return info_atomo;
+}
+
+// Função para ignorar uma linha de comentário #
 
 
 // IDENTIFICADOR -> LETRA_MINUSCULA (LETRA_MINUSCULA | DIGITO )*
-InfoAtomo reconhece_identificador(char *buffer){
+InfoAtomo reconhece_identificador(){
     int tamanho = 1;
     InfoAtomo info_atomo;
     info_atomo.atomo = ERRO;
@@ -103,24 +129,31 @@ q1:
     return info_atomo;
 }
 
-InfoAtomo obter_atomo(char *buffer){
+InfoAtomo obter_atomo(){
     InfoAtomo info_atomo;
+    char anterior;
 
     // consome espaços em branco quebra de linhas tabulação e retorno de carro
     while(*buffer == ' ' || *buffer == '\n' || *buffer == '\t' ||*buffer == '\r'){
         if( *buffer =='\n')
             conta_linha++;
-        buffer++;
+        (buffer)++;
     }
     // reconhece identificador
     if( islower(*buffer)){ // ser for letra mininuscula
-        info_atomo = reconhece_identificador(buffer);
+        info_atomo = reconhece_identificador();
     }else if(*buffer == 0){
         info_atomo.atomo = EOF_BUFFER;
     }else{
         info_atomo.atomo = ERRO;
     }
     info_atomo.linha = conta_linha;
+
+    if(*buffer == '{' && *(buffer + 1) == '-')
+    {
+        info_atomo = ignora_comentario_multiplas_linhas();
+    }
+    
     return info_atomo;
 
 }
@@ -168,14 +201,16 @@ int main(int argc, char *argv[])
     //char* buffer = le_arquivo(argv[1]); //executar como: ./compilador entrada.txt
 
     //Exemplo
-    char *buffer = "     var111@\n" 
-               " \r var2 \t \n\n\n\n"
-               " vaa3  ";
+    char *string = "{- Olá,\n Mundo\n Cruel! -}     var1\n"
+                    " \r var2 \t \n\n\n\n"
+                    " vaa3  ";
+    buffer = malloc(strlen(string) + 1);
+    strcpy(buffer, string);
 
     InfoAtomo info_atomo;
     do{
         // falta implementar o reconhecimento do atomo NUMERO
-        info_atomo = obter_atomo(buffer);
+        info_atomo = obter_atomo();
         if( info_atomo.atomo == IDENTIFICADOR)
         {
             printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
@@ -193,8 +228,8 @@ int main(int argc, char *argv[])
 
 
 
-    // Libera memória e fecha o arquivo
-
+    // Libera memória 
+    free(buffer);
     
 
     return 0;

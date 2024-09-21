@@ -14,6 +14,18 @@ char *msgAtomo[] = {
     "EOF_BUFFER",
     "COMENTARIO",
 
+    "+", //Operadores matemáticos
+    "*",
+    "-",
+    "/",
+
+    ">", //Operadores relacionais
+    "<",
+    ">=",
+    "<=",
+    "=",
+    "/=",
+
     "AND", //Palavras reservadas da linguagem
     "BEGIN",
     "BOOLEAN",

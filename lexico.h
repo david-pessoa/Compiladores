@@ -5,6 +5,18 @@ typedef enum{ //tipo dos átomos
     EOF_BUFFER,
     COMENTARIO,
 
+    OP_SOMA, //Operadores matemáticos
+    OP_MULT,
+    OP_SUB,
+    OP_DIV,
+
+    OP_MAIOR, //Operadores relacionais
+    OP_MENOR,
+    OP_MAIOR_IGUAL,
+    OP_MENOR_IGUAL,
+    OP_IGUAL,
+    OP_DIV_IGUAL, //'/='
+
     AND, //Palavras reservadas da linguagem
     BEGIN,
     BOOLEAN,

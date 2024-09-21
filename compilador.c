@@ -29,7 +29,10 @@ typedef enum{ //tipo dos átomos
     SET,
     TO,
     TRUE,
-    WRITE
+    WRITE,
+
+    VIRGULA,
+    PONTO_VIRGULA
 }Atomo;
 
 typedef struct{
@@ -63,7 +66,10 @@ char *msgAtomo[] = {
     "SET",
     "TO",
     "TRUE",
-    "WRITE"
+    "WRITE",
+
+    "VIRGULA",
+    "PONTO_VIRGULA"
 };
 
 //Só existem tipo bool e int
@@ -72,20 +78,6 @@ char *msgAtomo[] = {
 //Não existe else nem while (pelo que entendi)
 
 //consome() possui obter_atomo() em seu interior (faz chamadas)
-//Ignorar caracteres (‘ ’, ‘\n’, ‘\t, ‘\r’) OBS: usar '\n' para fazer contagem de linhas 
-
-//Comentários de uma linha: do '#' até o '\n'
-//Comentários de mais de uma linha: do '{-' até o '-}'
-
-//Iddentificadores: letra(letra|digito|_)* (OS IDENTIFICADORES SEMPRE LETRAS minúsculas!)
-//OBS: O máximo de caracteres para o identificador é 15, se tem mais tem que dar ERRO
-
-//palavras reservadas = [and, begin, boolean, elif, end, false, for, if, integer, not, of, or, program, read, set, to, true, write]
-//são sempre em minúsculo
-//Importante: Uma sugestão é que as palavras reservadas sejam reconhecidas na mesma função quereconhece os identificadores e deve ser retornado um átomo específico para cada palavrareservada reconhecida
-
-//Números: somente binários no formato: 0b(0|1)+
-//OBS: O número deve ser transformado em decimal
 
 //O Compilador deve ler o arquivo fonte com o nome informado por linha de comando
 // Ex: gcc -g -Og -Wall compilador.c -o compilador
@@ -101,14 +93,16 @@ char *msgAtomo[] = {
 
 
 //FUNÇÕES DO LÉXICO:
-//1) Extração e classificação de átomos
+//1) Extração e classificação de átomos ✅
 //2) Eliminação de delimitadores e comentários ✅
 //3) Conversão numérica ✅
-//4) Identificação de palavras reservadas
+//4) Identificação de palavras reservadas ✅
 //5) Tratamento de identificadores
 //6) Recuperação de erros
 //7) Interação com o sistema de arquivos
-//8) Controle da numeração de linhas do programa fonte 
+//8) Controle da numeração de linhas do programa fonte ✅
+
+//Para cada erro léxico do código, colocar uma mensagem explicando o erro
 
 int conta_linha = 1; // conta as linhas do arquivo
 char *buffer;
@@ -127,9 +121,10 @@ InfoAtomo reconhece_numero()
         buffer++;
     }
 
-    if(*buffer != '\n' && *buffer != '\0' && *buffer != ' ')
+    if(*buffer != '\n' && *buffer != '\0' && *buffer != ' ' && *buffer != ',' && *buffer != ';')
     {
         info_atomo.atomo = ERRO;
+        printf("aloha\n");
         return info_atomo;
     }
 
@@ -155,7 +150,7 @@ InfoAtomo ignora_comentario_multiplas_linhas() //Ignora múltiplas linhas de com
     while(!(*buffer == '-' && *(buffer + 1) == '}'))
     {
         buffer++;
-        if( *buffer =='\n')
+        if(*buffer =='\n')
             conta_linha++;
         
         if(*buffer == '\0' || *buffer == 0)
@@ -165,6 +160,11 @@ InfoAtomo ignora_comentario_multiplas_linhas() //Ignora múltiplas linhas de com
             return info_atomo;
         }
     }
+
+    if (*(buffer + 2) == '\n') {
+        conta_linha++;
+    }
+
     info_atomo.atomo = COMENTARIO;
     buffer += 2;
     return info_atomo;
@@ -199,7 +199,6 @@ InfoAtomo reconhece_identificador(){
     int tamanho = 1;
     InfoAtomo info_atomo;
     info_atomo.atomo = ERRO;
-    char *iniID = buffer;
     char string[16] = ""; //armazena palavra para verificar se é palavra reservada
     
     strncat(string, buffer, 1);
@@ -208,21 +207,25 @@ InfoAtomo reconhece_identificador(){
 
     //reconhecer as palavras reservadas
 
-q1:
-    if(islower(*buffer) || isdigit(*buffer || *buffer != '_')){
-        strncat(string, buffer, 1);
-        buffer++;
-        goto q1;
-    }
-    if(isupper(*buffer) && !isdigit(*buffer) && *buffer != '_')
-        return info_atomo;
 
-    if(tamanho > 15) // se for maior eh erro lexico
+    while((islower(*buffer) || isdigit(*buffer) || *buffer == '_') && tamanho <= 15){
+        strncat(string, buffer, 1);
+        tamanho++;
+        buffer++;
+    }
+    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')')
     {
+        printf("Erro: %s\n", string);
+        buffer++;
+        return info_atomo;
+    }
+    else if(tamanho > 15) // se for maior eh erro lexico
+    {
+        buffer++;
         return info_atomo;
     }
     
-    if(strcmp("and", string) == 0)
+    else if(strcmp("and", string) == 0)
     {
         strcpy(info_atomo.atributo_ID, string);
         info_atomo.atomo = AND;
@@ -350,8 +353,7 @@ q1:
 
     else
     {
-        strncpy(info_atomo.atributo_ID,iniID,buffer-iniID);
-        info_atomo.atributo_ID[buffer-iniID] = 0; // finaliza a string
+        strcpy(info_atomo.atributo_ID, string);
         info_atomo.atomo = IDENTIFICADOR;
         return info_atomo;
     }
@@ -362,41 +364,51 @@ InfoAtomo obter_atomo(){
 
     // consome espaços em branco quebra de linhas tabulação e retorno de carro
     while(*buffer == ' ' || *buffer == '\n' || *buffer == '\t' ||*buffer == '\r'){
-        if( *buffer =='\n')
+        if(*buffer =='\n')
             conta_linha++;
-        (buffer)++;
+        buffer++;
     }
+    info_atomo.linha = conta_linha;
+
     // reconhece identificador
     if( islower(*buffer)){ // ser for letra mininuscula
         info_atomo = reconhece_identificador();
     }else if(*buffer == 0){ // Se chegar ao fim do arquivo
         info_atomo.atomo = EOF_BUFFER;
-    }else{
-        info_atomo.atomo = ERRO; //Se encontrar qualquer outro caractere
     }
-    info_atomo.linha = conta_linha;
-
-    if(*buffer == '0' && *(buffer + 1) == 'b') //Reconhece número
+    else if(*buffer == '0' && *(buffer + 1) == 'b') //Reconhece número
     {
         info_atomo = reconhece_numero();
     }
-
-    if(*buffer == '{' && *(buffer + 1) == '-') //Se encontra comentário de múltiplas linhas
+    else if(*buffer == ',')
+    {
+        info_atomo.atomo = VIRGULA; //Reconhece vírgula
+        buffer++;
+    }
+    else if(*buffer == ';')
+    {
+        info_atomo.atomo = PONTO_VIRGULA; //Reconhece vírgula
+        buffer++;
+    }
+    else if(*buffer == '{' && *(buffer + 1) == '-') //Se encontra comentário de múltiplas linhas
     {
         info_atomo = ignora_comentario_multiplas_linhas();
     }
 
-    if(*buffer == '#')
+    else if(*buffer == '#')
         info_atomo = ignora_comentario();
     
+    else
+    {
+        info_atomo.atomo = ERRO;
+    }
     return info_atomo;
 
 }
 
-char* le_arquivo(char* nome_arq)
+int le_arquivo(char* nome_arq)
 {
     FILE *file;
-    char *buffer;
     long file_size;
 
     // Abra o arquivo em modo de leitura
@@ -404,7 +416,7 @@ char* le_arquivo(char* nome_arq)
 
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
-        return NULL;
+        return 1;
     }
 
     // Mova o ponteiro para o final do arquivo e obtenha o tamanho
@@ -418,33 +430,33 @@ char* le_arquivo(char* nome_arq)
     if (buffer == NULL) {
         perror("Erro ao alocar memória");
         fclose(file);
-        return NULL;
+        return 1;
     }
 
     // Lê o conteúdo do arquivo e coloca na string `buffer`
     fread(buffer, 1, file_size, file);
     buffer[file_size] = '\0'; // Adiciona o terminador nulo ao final da string
     fclose(file);
-
-    return buffer;
+    return 0;
 }
 
 
 
 int main(int argc, char *argv[])
 {
-    //char* buffer = le_arquivo(argv[1]); //executar como: ./compilador entrada.txt
-
+    if(le_arquivo(argv[1]))
+        printf("Erro ao ler o arquivo\n"); //executar como: ./compilador entrada.txt
+    /*
     //Exemplo
-    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101  false  var1\n"
+    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101,  false,  var1\n"
                     " \r var2 \t \n\n\n\n"
                     " vaa3  ";
     buffer = malloc(strlen(string) + 1);
     strcpy(buffer, string);
-
+    */
     InfoAtomo info_atomo;
     do{
-        // falta implementar o reconhecimento do atomo NUMERO
+        //implementar o analisador sintático
         info_atomo = obter_atomo();
         if( info_atomo.atomo == IDENTIFICADOR)
         {
@@ -458,7 +470,11 @@ int main(int argc, char *argv[])
             printf("%03d# %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo]);
 
     }while(info_atomo.atomo != EOF_BUFFER && info_atomo.atomo != ERRO);
-    printf("fim da analise lexica\n");
+    
+    if(info_atomo.atomo == EOF_BUFFER)
+        printf("%d linhas analisadas, programa sintaticamente correto", info_atomo.linha);
+
+
     return 0;
     
 

@@ -1,7 +1,7 @@
 {-
 programa le dois numeros inteiros e encontra o maior
 -}
-program exemplo2;
+program exemplo2
     integer num_1, num_2;
     integer maior;
 begin

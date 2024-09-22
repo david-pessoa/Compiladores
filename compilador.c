@@ -45,8 +45,12 @@ char *msgAtomo[] = {
     "TRUE",
     "WRITE",
 
-    "VIRGULA",
-    "PONTO_VIRGULA"
+    ",", //Sinais de "pontuação"
+    ";",
+    ".",
+    ":",
+    ")",
+    "()"
 };
 
 //Só existem tipo bool e int
@@ -59,9 +63,9 @@ char *msgAtomo[] = {
 //O Compilador deve ler o arquivo fonte com o nome informado por linha de comando
 // Ex: gcc -g -Og -Wall compilador.c -o compilador
 
-//O compilador deve informar na tela do computador cada átomo reconhecido no arquivo
+//O compilador deve informar na tela do computador cada átomo reconhecido no arquivo ✅
 
-//AO DETECTAR UM ERRO LÉXICO OU SINTÁTICO DEVE-SE PARAR O PROGRAMA E INFORMAR O ERRO E SEU TIPO
+//AO DETECTAR UM ERRO LÉXICO OU SINTÁTICO DEVE-SE PARAR O PROGRAMA E INFORMAR O ERRO E SEU TIPO ✅
 //Para erro sintático: deve-se informar o átomo esperado e qual foi o átomo encontrado
 
 //palavras-chaves (int, float...), operadores, identificadores, constantes,
@@ -74,8 +78,8 @@ char *msgAtomo[] = {
 //2) Eliminação de delimitadores e comentários ✅
 //3) Conversão numérica ✅
 //4) Identificação de palavras reservadas ✅
-//5) Tratamento de identificadores
-//6) Recuperação de erros
+//5) Tratamento de identificadores ✅
+//6) Recuperação de erros ✅
 //7) Interação com o sistema de arquivos
 //8) Controle da numeração de linhas do programa fonte ✅
 

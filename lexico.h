@@ -36,8 +36,12 @@ typedef enum{ //tipo dos átomos
     TRUE,
     WRITE,
 
-    VIRGULA,
-    PONTO_VIRGULA
+    VIRGULA, //Sinais de "pontuação"
+    PONTO_VIRGULA,
+    PONTO,
+    DOIS_PONTOS,
+    ABRE_PARENTESES,
+    FECHA_PARENTESES
 }Atomo;
 
 typedef struct{
@@ -47,6 +51,8 @@ typedef struct{
     char mensagem_erro[100];
     int numero;
 }InfoAtomo;
+
+//############################### ANALISADOR LÉXICO ###############################
 
 int conta_linha = 1; // conta as linhas do arquivo
 char *buffer;
@@ -335,6 +341,76 @@ InfoAtomo obter_atomo(){
         info_atomo.atomo = PONTO_VIRGULA; //Reconhece vírgula
         buffer++;
     }
+    else if (*buffer == '.')
+    {
+        info_atomo.atomo = PONTO;
+        buffer++;
+    }
+    else if (*buffer == ':')
+    {
+        info_atomo.atomo = DOIS_PONTOS;
+        buffer++;
+    }
+    else if (*buffer == '(')
+    {
+        info_atomo.atomo = ABRE_PARENTESES;
+        buffer++;
+    }
+    else if (*buffer == ')')
+    {
+        info_atomo.atomo = FECHA_PARENTESES;
+        buffer++;
+    }
+    else if (*buffer == '+')
+    {
+        info_atomo.atomo = OP_SOMA;
+        buffer++;
+    }
+    else if (*buffer == '-')
+    {
+        info_atomo.atomo = OP_SUB;
+        buffer++;
+    }
+    else if (*buffer == '*')
+    {
+        info_atomo.atomo = OP_MULT;
+        buffer++;
+    }
+    else if (*buffer == '/')
+    {
+        info_atomo.atomo = OP_DIV;
+        buffer++;
+    }
+    else if (*buffer == '>')
+    {
+        info_atomo.atomo = OP_MAIOR;
+        buffer++;
+    }
+    else if (*buffer == '<')
+    {
+        info_atomo.atomo = OP_MENOR;
+        buffer++;
+    }
+    else if (*buffer == '>' && *(buffer + 1) == '=')
+    {
+        info_atomo.atomo = OP_MAIOR_IGUAL;
+        buffer++;
+    }
+    else if (*buffer == '<' && *(buffer + 1) == '=')
+    {
+        info_atomo.atomo = OP_MENOR_IGUAL;
+        buffer++;
+    }
+    else if (*buffer == '=')
+    {
+        info_atomo.atomo = OP_IGUAL;
+        buffer++;
+    }
+    else if (*buffer == '/' && *(buffer + 1) == '=')
+    {
+        info_atomo.atomo = OP_DIV_IGUAL;
+        buffer++;
+    }
     else if(*buffer == '{' && *(buffer + 1) == '-') //Se encontra comentário de múltiplas linhas
     {
         info_atomo = ignora_comentario_multiplas_linhas();
@@ -384,4 +460,12 @@ int le_arquivo(char* nome_arq)
     buffer[file_size] = '\0'; // Adiciona o terminador nulo ao final da string
     fclose(file);
     return 0;
+}
+
+//############################### ANALISADOR SINTÁTICO ###############################
+Atomo lookahead;
+
+void consome(Atomo atomo)
+{
+
 }

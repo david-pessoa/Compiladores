@@ -1,0 +1,21 @@
+do{
+        //implementar o analisador sintático
+        info_atomo = obter_atomo();
+        if( info_atomo.atomo == IDENTIFICADOR)
+        {
+            printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
+        }
+        else if (info_atomo.atomo == NUMERO) 
+        {
+            printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
+        }
+        else if (info_atomo.atomo == ERRO)
+            printf("%03d# %s\n",info_atomo.linha, info_atomo.mensagem_erro);
+        
+        else
+            printf("%03d# %s\n", info_atomo.linha, msgAtomo[info_atomo.atomo]);
+
+    }while(info_atomo.atomo != EOF_BUFFER && info_atomo.atomo != ERRO);
+    
+    if(info_atomo.atomo == EOF_BUFFER)
+        printf("%d linhas analisadas, programa sintaticamente correto", info_atomo.linha);

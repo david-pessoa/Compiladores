@@ -50,7 +50,7 @@ char *msgAtomo[] = {
     ".",
     ":",
     ")",
-    "()"
+    "("
 };
 
 //Só existem tipo bool e int
@@ -85,6 +85,154 @@ char *msgAtomo[] = {
 
 //Para cada erro léxico do código, colocar uma mensagem explicando o erro ✅
 
+Atomo lookahead;//posteriormente sera do tipo TAtomo, declarado no ASDR
+InfoAtomo info_atomo;
+
+//############################### ANALISADOR SINTÁTICO ###############################
+
+void consome(Atomo atomo){
+    if(lookahead==atomo){
+        info_atomo = obter_atomo();
+        lookahead=info_atomo.atomo;
+    }
+    else{
+        printf("#%d:Erro sintático:esperado [%s] encontrado [%s] \n",info_atomo.linha,msgAtomo[atomo],msgAtomo[lookahead]);
+        exit(0); // Encerra execução
+    }
+}
+/*
+<comando> ::= <comando_atribuicao> |
+<comando_condicional> |
+<comando_repeticao> |
+<comando_entrada> |
+<comando_saida> |
+<comando_composto>
+*/
+void comando()
+{
+    switch (lookahead)
+    {
+    case SET:
+        comando_atribuicao(); // Falta Implementar
+        break;
+    
+    case IF:
+        comando_condicional(); // Falta Implementar
+        break;
+    
+    case FOR:
+        comando_repeticao(); // Falta Implementar
+        break;
+    
+    case READ:
+        comando_entrada(); // Falta Implementar
+        break;
+    
+    case WRITE:
+        comando_saida(); // Falta Implementar
+        break;
+    
+    case BEGIN:
+        comando_composto(); // Falta Implementar
+        break;
+
+    default:
+        break;
+    }
+}
+
+//<comando_composto> ::= begin <comando> {“;”<comando>} end
+void comando_composto()
+{
+    switch (lookahead)
+    {
+    case BEGIN:
+        consome(BEGIN);
+        comando();
+        comando_composto();
+        break;
+    
+    case PONTO_VIRGULA:
+        consome(PONTO_VIRGULA);
+        comando();
+        comando_composto();
+        break;
+    
+    case END:
+        consome(END);
+        break;
+        
+    default:
+        break;
+    }
+}
+
+//<lista_variavel> ::= identificador { “,” identificador }
+void lista_variavel()
+{
+    switch (lookahead)
+    {
+    case IDENTIFICADOR:
+        consome(IDENTIFICADOR);
+        lista_variavel();
+        break;
+    
+    case VIRGULA:
+        consome(VIRGULA);
+        consome(IDENTIFICADOR);
+        lista_variavel();
+    
+    default:
+        break;
+    }
+}
+
+//<declaracao_de_variaveis> ::= {<tipo> <lista_variavel> “;”}
+void declaracao_de_variaveis()
+{
+    switch (lookahead)
+    {
+    case INTEGER:
+        lista_variavel();
+        consome(PONTO_VIRGULA);
+        break;
+    
+    case BOOLEAN:
+        lista_variavel();
+        consome(PONTO_VIRGULA);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+//<bloco>::= <declaracao_de_variaveis> <comando_composto>
+void bloco()
+{
+    declaracao_de_variaveis();
+    comando_composto();
+}
+
+//<programa> ::= program identificador “;” <bloco> “.”
+void programa()
+{
+    switch (lookahead)
+    {
+    case PROGRAM:
+        consome(PROGRAM);
+        consome(IDENTIFICADOR);
+        consome(PONTO_VIRGULA);
+        bloco();
+        consome(PONTO);
+        break;
+    
+    default:
+        consome(COMENTARIO);
+        programa();
+        break;
+    }
+}
 
 
 
@@ -98,40 +246,15 @@ int main(int argc, char *argv[])
         printf("Erro: Nenhum arquivo de entrada foi fornecido.\n");
         return 1;
     }
-    /*
-    //Exemplo
-    char *string = "{- Olá,\n Mundo\n Cruel! -} 0b101,  false,  var1\n"
-                    " \r var2 \t \n\n\n\n"
-                    " vaa3  ";
-    buffer = malloc(strlen(string) + 1);
-    strcpy(buffer, string);
-    */
-    InfoAtomo info_atomo;
-    do{
-        //implementar o analisador sintático
-        info_atomo = obter_atomo();
-        if( info_atomo.atomo == IDENTIFICADOR)
-        {
-            printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
-        }
-        else if (info_atomo.atomo == NUMERO) 
-        {
-            printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
-        }
-        else if (info_atomo.atomo == ERRO)
-            printf("%03d# %s\n",info_atomo.linha, info_atomo.mensagem_erro);
-        
-        else
-            printf("%03d# %s\n", info_atomo.linha, msgAtomo[info_atomo.atomo]);
 
-    }while(info_atomo.atomo != EOF_BUFFER && info_atomo.atomo != ERRO);
-    
-    if(info_atomo.atomo == EOF_BUFFER)
-        printf("%d linhas analisadas, programa sintaticamente correto", info_atomo.linha);
-    
+    info_atomo = obter_atomo();
+    lookahead=info_atomo.atomo;
 
+    programa(); // simbolo inicial da gramatica
 
+    consome(EOF_BUFFER); // se lookahead chegou ao final
 
+    printf("%d linhas analisadas, programa sintaticamente correto\n", info_atomo.linha);
 
 
     // Se precisar, Libera memória 

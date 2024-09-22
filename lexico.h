@@ -52,6 +52,9 @@ typedef struct{
     int numero;
 }InfoAtomo;
 
+extern char *msgAtomo[];
+
+
 //############################### ANALISADOR LÉXICO ###############################
 
 int conta_linha = 1; // conta as linhas do arquivo
@@ -424,6 +427,19 @@ InfoAtomo obter_atomo(){
         info_atomo.atomo = ERRO;
         strcpy(info_atomo.mensagem_erro, "Erro léxico: não foi possível identificar o átomo");
     }
+
+    if( info_atomo.atomo == IDENTIFICADOR)
+            printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
+        
+        else if (info_atomo.atomo == NUMERO) 
+            printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
+
+        else if (info_atomo.atomo == ERRO)
+            printf("%03d# %s\n",info_atomo.linha, info_atomo.mensagem_erro);
+        
+        else
+            printf("%03d# %s\n", info_atomo.linha, msgAtomo[info_atomo.atomo]);
+
     return info_atomo;
 
 }
@@ -460,12 +476,4 @@ int le_arquivo(char* nome_arq)
     buffer[file_size] = '\0'; // Adiciona o terminador nulo ao final da string
     fclose(file);
     return 0;
-}
-
-//############################### ANALISADOR SINTÁTICO ###############################
-Atomo lookahead;
-
-void consome(Atomo atomo)
-{
-
 }

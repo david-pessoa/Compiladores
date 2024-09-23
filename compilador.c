@@ -101,6 +101,241 @@ void consome(Atomo atomo){
     }
 }
 /*
+<fator> ::= identificador | 
+numero        | 
+true          | 
+false         | 
+not <fator>   | 
+“(“ <expressao> “)”
+*/
+void fator()
+{
+    switch (lookahead)
+    {
+    case IDENTIFICADOR:
+        consome(IDENTIFICADOR);
+        break;
+    
+    case NUMERO:
+        consome(NUMERO);
+        break;
+    
+    case TRUE:
+        consome(TRUE);
+        break;
+    
+    case NOT:
+        fator();
+        consome(ABRE_PARENTESES);
+        expressao();
+        consome(FECHA_PARENTESES);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+//<termo> ::= <fator> { ( “*” | “/” ) <fator> } 
+void termo()
+{
+    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    {
+        fator();
+        termo();
+    }
+    else if(lookahead == OP_MULT)
+    {
+        consome(OP_MULT);
+        fator();
+        termo();
+    }
+    else if(lookahead == OP_DIV)
+    {
+        consome(OP_DIV);
+        fator();
+        termo();
+    }
+}
+
+// <expressao_simples> ::= <termo> { (“+” | “−” ) <termo> }
+void expressao_simples()
+{
+    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    {
+        termo();
+        expressao_simples();
+    }
+    else if(lookahead == OP_SOMA)
+    {
+        consome(OP_SOMA);
+        termo();
+        expressao_simples();
+    }
+    else if(lookahead == OP_SUB)
+    {
+        consome(OP_SUB);
+        termo();
+        expressao_simples();
+    }
+}
+
+//<op_relacional> ::= “<” | “<=” | “=” | “/=” | “>” | “>=”
+void op_relacional()
+{
+    switch (lookahead)
+    {
+    case OP_MENOR:
+        consome(OP_MENOR);
+        break;
+    
+    case OP_MENOR_IGUAL:
+        consome(OP_MENOR_IGUAL);
+        break;
+    
+    case OP_IGUAL:
+        consome(OP_IGUAL);
+        break;
+    
+    case OP_DIV_IGUAL:
+        consome(OP_DIV_IGUAL);
+        break;
+    
+    case OP_MAIOR:
+        consome(OP_MAIOR);
+        break;
+    
+    case OP_MAIOR_IGUAL:
+        consome(OP_MAIOR_IGUAL);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+//<expressão_relacional> ::= <expressao_simples> [<op_relacional> <expressao_simples>]
+void expressao_relacional()
+{
+    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    {
+        expressao_simples();
+    }
+    // else -> erro
+    if(lookahead == OP_MENOR || lookahead == OP_MENOR_IGUAL || lookahead == OP_IGUAL || lookahead == OP_DIV_IGUAL || lookahead == OP_MAIOR || lookahead == OP_MAIOR_IGUAL)
+    {
+        op_relacional();
+        expressao_simples();
+    }
+}
+
+//<expressao_logica>::= <expressao_relacional> { and <expressao_relacional> }
+void expressao_logica()
+{
+    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    {
+        expressao_relacional();
+        expressao_logica();
+    }
+    else if(lookahead == AND)
+    {
+        consome(AND);
+        expressao_relacional();
+        expressao_logica();
+    }
+}
+
+//<expressao> ::= <expressao_logica> { or <expressao_logica> }
+void expressao()
+{
+    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    {
+        expressao_logica();
+        expressao();
+    }
+    else if(lookahead == OR)
+    {
+        consome(OR);
+        expressao_logica();
+        expressao();
+    }
+
+}
+
+//<comando_repeticao> ::= for identificador of <expressão> to <expressão> “:” <comando>
+void comando_repeticao()
+{
+    consome(FOR);
+    consome(IDENTIFICADOR);
+    consome(TO);
+    expressao();
+    consome(TO);
+    expressao();
+    consome(DOIS_PONTOS);
+    comando();
+}
+
+//<comando_entrada> ::= read “(“ <lista_variavel> “)”
+void comando_entrada()
+{
+    consome(READ);
+    consome(ABRE_PARENTESES);
+    lista_variavel();
+    consome(FECHA_PARENTESES);
+}
+
+//<comando_saida> ::= write “(“ <expressao> { “,” <expressao> } “)”
+void comando_saida()
+{
+    switch (lookahead)
+    {
+    case WRITE:
+        consome(WRITE);
+        consome(ABRE_PARENTESES);
+        expressao();
+        comando_saida();
+        break;
+    
+    case VIRGULA:
+        consome(VIRGULA);
+        expressao();
+        comando_saida();
+        break;
+    
+    case FECHA_PARENTESES:
+        consome(FECHA_PARENTESES);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+//<comando_condicional> ::= if <expressao> “:” <comando> [elif <comando>]
+void comando_condicional()
+{
+    consome(IF);
+    expressao();
+    consome(DOIS_PONTOS);
+    comando();
+
+    if(lookahead == ELIF)
+    {
+        consome(ELIF);
+        comando();
+    }
+}
+
+//<comando_atribuicao> ::= set identificador to <expressao>
+void comando_atribuicao()
+{
+    consome(SET);
+    consome(IDENTIFICADOR);
+    consome(TO);
+    expressao();
+}
+
+/*
 <comando> ::= <comando_atribuicao> |
 <comando_condicional> |
 <comando_repeticao> |
@@ -113,11 +348,11 @@ void comando()
     switch (lookahead)
     {
     case SET:
-        comando_atribuicao(); // Falta Implementar
+        comando_atribuicao(); //Implementado
         break;
     
     case IF:
-        comando_condicional(); // Falta Implementar
+        comando_condicional(); // Implementado
         break;
     
     case FOR:
@@ -195,11 +430,13 @@ void declaracao_de_variaveis()
     case INTEGER:
         lista_variavel();
         consome(PONTO_VIRGULA);
+        declaracao_de_variaveis();
         break;
     
     case BOOLEAN:
         lista_variavel();
         consome(PONTO_VIRGULA);
+        declaracao_de_variaveis();
         break;
     
     default:

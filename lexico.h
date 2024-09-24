@@ -118,7 +118,7 @@ InfoAtomo reconhece_identificador(){
         tamanho++;
         buffer++;
     }
-    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')')
+    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.')
     {
         strcpy(info_atomo.mensagem_erro, "Erro léxico: identificador inválido!");
         buffer++;
@@ -387,7 +387,10 @@ InfoAtomo obter_atomo(){
             printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
 
         else if (info_atomo.atomo == ERRO)
+        {
             printf("%03d# %s\n",info_atomo.linha, info_atomo.mensagem_erro);
+            exit(0);
+        }
         
         else
             printf("%03d# %s\n", info_atomo.linha, msgAtomo[info_atomo.atomo]);

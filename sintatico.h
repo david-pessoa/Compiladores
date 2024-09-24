@@ -228,38 +228,37 @@ void comando_entrada()
 //<comando_saida> ::= write “(“ <expressao> { “,” <expressao> } “)”
 void comando_saida()
 {
-    switch (lookahead)
+    if (lookahead == WRITE)
     {
-    case WRITE:
         consome(WRITE);
         consome(ABRE_PARENTESES);
         expressao();
         comando_saida();
-        break;
+    }
     
-    case VIRGULA:
+    else if(lookahead == VIRGULA)
+    {
         consome(VIRGULA);
         expressao();
         comando_saida();
-        break;
-    
-    case FECHA_PARENTESES:
-        consome(FECHA_PARENTESES);
-        break;
-    
-    default:
-        break;
     }
+    
+    else
+        consome(FECHA_PARENTESES);
+
+    
 }
 
 //<comando_condicional> ::= if <expressao> “:” <comando> [elif <comando>]
 void comando_condicional()
 {
-    consome(IF);
-    expressao();
-    consome(DOIS_PONTOS);
-    comando();
-
+    if(lookahead == IF)
+    {
+        consome(IF);
+        expressao();
+        consome(DOIS_PONTOS);
+        comando();
+    }
     if(lookahead == ELIF)
     {
         consome(ELIF);
@@ -369,12 +368,14 @@ void declaracao_de_variaveis()
     switch (lookahead)
     {
     case INTEGER:
+        consome(INTEGER);
         lista_variavel();
         consome(PONTO_VIRGULA);
         declaracao_de_variaveis();
         break;
     
     case BOOLEAN:
+        consome(INTEGER);
         lista_variavel();
         consome(PONTO_VIRGULA);
         declaracao_de_variaveis();

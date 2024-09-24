@@ -89,8 +89,8 @@ char *msgAtomo[] = { //Colocar no sintatico.h mais tarde
     ";",
     ".",
     ":",
-    ")",
-    "("
+    "(",
+    ")"
 };
 
 typedef struct InfoAtomo{

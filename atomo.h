@@ -5,7 +5,7 @@ typedef enum{ //tipo dos átomos
     IDENTIFICADOR,
     NUMERO,
     ERRO,
-    EOF_BUFFER,
+    EOF_BUFFER, // Átomo para indicar fim do BUFFER
     COMENTARIO,
 
     OP_SOMA, //Operadores matemáticos
@@ -93,11 +93,11 @@ char *msgAtomo[] = { //Colocar no sintatico.h mais tarde
     ")"
 };
 
-typedef struct InfoAtomo{
+typedef struct InfoAtomo{ //atributos do átomo
     Atomo atomo;
     int linha;
-    char atributo_ID[100];
-    char mensagem_erro[100];
+    char atributo_ID[100]; // string para armazenar palavra reservada ou ident
+    char mensagem_erro[100]; //string para armazenar possível mensagem de erro gerada
     int numero;
 }InfoAtomo;
 

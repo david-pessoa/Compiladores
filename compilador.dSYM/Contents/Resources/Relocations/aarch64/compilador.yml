@@ -2,36 +2,36 @@
 triple:          'arm64-apple-darwin'
 binary-path:     compilador
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x100001278, symSize: 0x164 }
-  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _msgAtomo, symObjAddr: 0x2C28, symBinAddr: 0x100008000, symSize: 0x0 }
-  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _conta_linha, symObjAddr: 0x2D60, symBinAddr: 0x100008138, symSize: 0x0 }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x1000013EC, symSize: 0x164 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _msgAtomo, symObjAddr: 0x2AB8, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _conta_linha, symObjAddr: 0x2BF0, symBinAddr: 0x100008138, symSize: 0x0 }
   - { offsetInCU: 0x8F, offset: 0x8F, size: 0x8, addend: 0x0, symName: _buffer, symBinAddr: 0x100008140, symSize: 0x0 }
   - { offsetInCU: 0xA4, offset: 0xA4, size: 0x8, addend: 0x0, symName: _lookahead, symBinAddr: 0x10000821C, symSize: 0x0 }
   - { offsetInCU: 0x1BE, offset: 0x1BE, size: 0x8, addend: 0x0, symName: _info_atomo, symBinAddr: 0x100008148, symSize: 0x0 }
-  - { offsetInCU: 0x224, offset: 0x224, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x100001278, symSize: 0x164 }
-  - { offsetInCU: 0x296, offset: 0x296, size: 0x8, addend: 0x0, symName: _ignora_comentario_multiplas_linhas, symObjAddr: 0x164, symBinAddr: 0x1000013DC, symSize: 0xCC }
-  - { offsetInCU: 0x2BE, offset: 0x2BE, size: 0x8, addend: 0x0, symName: _ignora_comentario, symObjAddr: 0x230, symBinAddr: 0x1000014A8, symSize: 0x68 }
-  - { offsetInCU: 0x328, offset: 0x328, size: 0x8, addend: 0x0, symName: _reconhece_identificador, symObjAddr: 0x298, symBinAddr: 0x100001510, symSize: 0x57C }
-  - { offsetInCU: 0x404, offset: 0x404, size: 0x8, addend: 0x0, symName: _obter_atomo, symObjAddr: 0x814, symBinAddr: 0x100001A8C, symSize: 0x2DC }
-  - { offsetInCU: 0x4B8, offset: 0x4B8, size: 0x8, addend: 0x0, symName: _le_arquivo, symObjAddr: 0xAF0, symBinAddr: 0x100001D68, symSize: 0xC0 }
-  - { offsetInCU: 0x7D2, offset: 0x7D2, size: 0x8, addend: 0x0, symName: _consome, symObjAddr: 0xBB0, symBinAddr: 0x100001E28, symSize: 0xF0 }
-  - { offsetInCU: 0x817, offset: 0x817, size: 0x8, addend: 0x0, symName: _fator, symObjAddr: 0xCA0, symBinAddr: 0x100001F18, symSize: 0x188 }
-  - { offsetInCU: 0x89B, offset: 0x89B, size: 0x8, addend: 0x0, symName: _expressao, symObjAddr: 0x1290, symBinAddr: 0x100002508, symSize: 0xE8 }
-  - { offsetInCU: 0x8FA, offset: 0x8FA, size: 0x8, addend: 0x0, symName: _termo, symObjAddr: 0xE28, symBinAddr: 0x1000020A0, symSize: 0xF4 }
-  - { offsetInCU: 0x93E, offset: 0x93E, size: 0x8, addend: 0x0, symName: _expressao_simples, symObjAddr: 0xF1C, symBinAddr: 0x100002194, symSize: 0xF4 }
-  - { offsetInCU: 0x982, offset: 0x982, size: 0x8, addend: 0x0, symName: _op_relacional, symObjAddr: 0x1010, symBinAddr: 0x100002288, symSize: 0xDC }
-  - { offsetInCU: 0x9AC, offset: 0x9AC, size: 0x8, addend: 0x0, symName: _expressao_relacional, symObjAddr: 0x10EC, symBinAddr: 0x100002364, symSize: 0x6C }
-  - { offsetInCU: 0x9EF, offset: 0x9EF, size: 0x8, addend: 0x0, symName: _expressao_logica, symObjAddr: 0x1158, symBinAddr: 0x1000023D0, symSize: 0x138 }
-  - { offsetInCU: 0xA9D, offset: 0xA9D, size: 0x8, addend: 0x0, symName: _comando_repeticao, symObjAddr: 0x1378, symBinAddr: 0x1000025F0, symSize: 0x2A4 }
-  - { offsetInCU: 0xBB6, offset: 0xBB6, size: 0x8, addend: 0x0, symName: _comando, symObjAddr: 0x1DC0, symBinAddr: 0x100003038, symSize: 0x2AC }
-  - { offsetInCU: 0xCCE, offset: 0xCCE, size: 0x8, addend: 0x0, symName: _comando_entrada, symObjAddr: 0x161C, symBinAddr: 0x100002894, symSize: 0x1DC }
-  - { offsetInCU: 0xD6F, offset: 0xD6F, size: 0x8, addend: 0x0, symName: _lista_variavel, symObjAddr: 0x2198, symBinAddr: 0x100003410, symSize: 0x1A8 }
-  - { offsetInCU: 0xE1E, offset: 0xE1E, size: 0x8, addend: 0x0, symName: _comando_saida, symObjAddr: 0x17F8, symBinAddr: 0x100002A70, symSize: 0x238 }
-  - { offsetInCU: 0xEF6, offset: 0xEF6, size: 0x8, addend: 0x0, symName: _comando_condicional, symObjAddr: 0x1A30, symBinAddr: 0x100002CA8, symSize: 0x1BC }
-  - { offsetInCU: 0xFBC, offset: 0xFBC, size: 0x8, addend: 0x0, symName: _comando_atribuicao, symObjAddr: 0x1BEC, symBinAddr: 0x100002E64, symSize: 0x1D4 }
-  - { offsetInCU: 0x1069, offset: 0x1069, size: 0x8, addend: 0x0, symName: _comando_composto, symObjAddr: 0x206C, symBinAddr: 0x1000032E4, symSize: 0x12C }
-  - { offsetInCU: 0x10DE, offset: 0x10DE, size: 0x8, addend: 0x0, symName: _declaracao_de_variaveis, symObjAddr: 0x2340, symBinAddr: 0x1000035B8, symSize: 0x180 }
-  - { offsetInCU: 0x1186, offset: 0x1186, size: 0x8, addend: 0x0, symName: _bloco, symObjAddr: 0x24C0, symBinAddr: 0x100003738, symSize: 0x14 }
-  - { offsetInCU: 0x11BD, offset: 0x11BD, size: 0x8, addend: 0x0, symName: _programa, symObjAddr: 0x24D4, symBinAddr: 0x10000374C, symSize: 0x354 }
-  - { offsetInCU: 0x1321, offset: 0x1321, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x2828, symBinAddr: 0x100003AA0, symSize: 0x58 }
+  - { offsetInCU: 0x224, offset: 0x224, size: 0x8, addend: 0x0, symName: _reconhece_numero, symObjAddr: 0x0, symBinAddr: 0x1000013EC, symSize: 0x164 }
+  - { offsetInCU: 0x296, offset: 0x296, size: 0x8, addend: 0x0, symName: _ignora_comentario_multiplas_linhas, symObjAddr: 0x164, symBinAddr: 0x100001550, symSize: 0xCC }
+  - { offsetInCU: 0x2BE, offset: 0x2BE, size: 0x8, addend: 0x0, symName: _ignora_comentario, symObjAddr: 0x230, symBinAddr: 0x10000161C, symSize: 0x68 }
+  - { offsetInCU: 0x328, offset: 0x328, size: 0x8, addend: 0x0, symName: _reconhece_palavra, symObjAddr: 0x298, symBinAddr: 0x100001684, symSize: 0x464 }
+  - { offsetInCU: 0x404, offset: 0x404, size: 0x8, addend: 0x0, symName: _obter_atomo, symObjAddr: 0x6FC, symBinAddr: 0x100001AE8, symSize: 0x2DC }
+  - { offsetInCU: 0x4B6, offset: 0x4B6, size: 0x8, addend: 0x0, symName: _le_arquivo, symObjAddr: 0x9D8, symBinAddr: 0x100001DC4, symSize: 0xC0 }
+  - { offsetInCU: 0x7D0, offset: 0x7D0, size: 0x8, addend: 0x0, symName: _consome, symObjAddr: 0xA98, symBinAddr: 0x100001E84, symSize: 0xF0 }
+  - { offsetInCU: 0x815, offset: 0x815, size: 0x8, addend: 0x0, symName: _fator, symObjAddr: 0xB88, symBinAddr: 0x100001F74, symSize: 0x188 }
+  - { offsetInCU: 0x89E, offset: 0x89E, size: 0x8, addend: 0x0, symName: _expressao, symObjAddr: 0x1120, symBinAddr: 0x10000250C, symSize: 0xE8 }
+  - { offsetInCU: 0x8FD, offset: 0x8FD, size: 0x8, addend: 0x0, symName: _termo, symObjAddr: 0xD10, symBinAddr: 0x1000020FC, symSize: 0xF4 }
+  - { offsetInCU: 0x941, offset: 0x941, size: 0x8, addend: 0x0, symName: _expressao_simples, symObjAddr: 0xE04, symBinAddr: 0x1000021F0, symSize: 0xF4 }
+  - { offsetInCU: 0x985, offset: 0x985, size: 0x8, addend: 0x0, symName: _op_relacional, symObjAddr: 0xEF8, symBinAddr: 0x1000022E4, symSize: 0xDC }
+  - { offsetInCU: 0x9AF, offset: 0x9AF, size: 0x8, addend: 0x0, symName: _expressao_relacional, symObjAddr: 0xFD4, symBinAddr: 0x1000023C0, symSize: 0x38 }
+  - { offsetInCU: 0x9F2, offset: 0x9F2, size: 0x8, addend: 0x0, symName: _expressao_logica, symObjAddr: 0x100C, symBinAddr: 0x1000023F8, symSize: 0x114 }
+  - { offsetInCU: 0xAA0, offset: 0xAA0, size: 0x8, addend: 0x0, symName: _comando_repeticao, symObjAddr: 0x1208, symBinAddr: 0x1000025F4, symSize: 0x2A4 }
+  - { offsetInCU: 0xBB9, offset: 0xBB9, size: 0x8, addend: 0x0, symName: _comando, symObjAddr: 0x1C50, symBinAddr: 0x10000303C, symSize: 0x2AC }
+  - { offsetInCU: 0xCCE, offset: 0xCCE, size: 0x8, addend: 0x0, symName: _comando_entrada, symObjAddr: 0x14AC, symBinAddr: 0x100002898, symSize: 0x1DC }
+  - { offsetInCU: 0xD6F, offset: 0xD6F, size: 0x8, addend: 0x0, symName: _lista_variavel, symObjAddr: 0x2028, symBinAddr: 0x100003414, symSize: 0x1A8 }
+  - { offsetInCU: 0xE1E, offset: 0xE1E, size: 0x8, addend: 0x0, symName: _comando_saida, symObjAddr: 0x1688, symBinAddr: 0x100002A74, symSize: 0x238 }
+  - { offsetInCU: 0xEF6, offset: 0xEF6, size: 0x8, addend: 0x0, symName: _comando_condicional, symObjAddr: 0x18C0, symBinAddr: 0x100002CAC, symSize: 0x1BC }
+  - { offsetInCU: 0xFB9, offset: 0xFB9, size: 0x8, addend: 0x0, symName: _comando_atribuicao, symObjAddr: 0x1A7C, symBinAddr: 0x100002E68, symSize: 0x1D4 }
+  - { offsetInCU: 0x1065, offset: 0x1065, size: 0x8, addend: 0x0, symName: _comando_composto, symObjAddr: 0x1EFC, symBinAddr: 0x1000032E8, symSize: 0x12C }
+  - { offsetInCU: 0x10DA, offset: 0x10DA, size: 0x8, addend: 0x0, symName: _declaracao_de_variaveis, symObjAddr: 0x21D0, symBinAddr: 0x1000035BC, symSize: 0x180 }
+  - { offsetInCU: 0x1182, offset: 0x1182, size: 0x8, addend: 0x0, symName: _bloco, symObjAddr: 0x2350, symBinAddr: 0x10000373C, symSize: 0x14 }
+  - { offsetInCU: 0x11B9, offset: 0x11B9, size: 0x8, addend: 0x0, symName: _programa, symObjAddr: 0x2364, symBinAddr: 0x100003750, symSize: 0x354 }
+  - { offsetInCU: 0x131D, offset: 0x131D, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x26B8, symBinAddr: 0x100003AA4, symSize: 0x58 }
 ...

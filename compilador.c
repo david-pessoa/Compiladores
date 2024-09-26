@@ -15,10 +15,10 @@
 
 /* TODO:
     1) Descobrir um modo de fazer com que o código ignore os comentários
-    2) Comentar o código
+    2) Comentar o código ✅
     3) Elaborar um README.md
     4) Criar outros casos teste
-    5) Eliminar os switch cases quando não houver como ter uma opção default
+    5) Criar uma função para encontrar o erro gerado quando o código cai no else ou default
 */
 
 int main(int argc, char *argv[])

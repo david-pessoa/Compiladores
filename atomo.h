@@ -49,7 +49,7 @@ typedef enum{ //tipo dos átomos
     INICIA_SINTATICO // Indica o início do funcionamento do analisador sintático
 }Atomo;
 
-char *msgAtomo[] = { //Colocar no sintatico.h mais tarde
+char *msgAtomo[] = {
     "IDENTIFICADOR",
     "NUMERO",
     "ERRO",

@@ -94,11 +94,11 @@ char *msgAtomo[] = { //Colocar no sintatico.h mais tarde
 };
 
 typedef struct InfoAtomo{ //atributos do átomo
-    Atomo atomo;
-    int linha;
-    char atributo_ID[100]; // string para armazenar palavra reservada ou ident
+    Atomo atomo; // Tipo do átomo
+    int linha; // Linha em que o átomo foi encontrado
+    char atributo_ID[100]; //Armazena identificador, se o átomo for um identificador
     char mensagem_erro[100]; //string para armazenar possível mensagem de erro gerada
-    int numero;
+    int numero; //Armazena o número, se o átomo for um número
 }InfoAtomo;
 
 #endif  // Finaliza o bloqueio de redefinição

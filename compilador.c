@@ -18,7 +18,7 @@
     2) Comentar o código ✅
     3) Elaborar um README.md
     4) Criar outros casos teste
-    5) Criar uma função para encontrar o erro gerado quando o código cai no else ou default
+    5) Implementar parâmetro de controle i nas funções com recursividade do analisador sintático
 */
 
 int main(int argc, char *argv[])

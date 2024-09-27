@@ -44,7 +44,9 @@ typedef enum{ //tipo dos átomos
     PONTO,
     DOIS_PONTOS,
     ABRE_PARENTESES,
-    FECHA_PARENTESES
+    FECHA_PARENTESES,
+
+    INICIA_SINTATICO // Indica o início do funcionamento do analisador sintático
 }Atomo;
 
 char *msgAtomo[] = { //Colocar no sintatico.h mais tarde

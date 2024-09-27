@@ -239,6 +239,7 @@ InfoAtomo reconhece_palavra(){
     else //Se não identifica que a string lida é uma palavra reservada, é porque ela é um identificador
     {
         info_atomo.atomo = IDENTIFICADOR;
+        strcpy(info_atomo.atributo_ID, string);
         return info_atomo;
     }
 }

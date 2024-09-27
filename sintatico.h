@@ -8,17 +8,17 @@
 
 #ifndef LOOKAHEAD_H
 #define LOOKAHEAD_H
-Atomo lookahead;//posteriormente sera do tipo TAtomo, declarado no ASDR
+Atomo lookahead = INICIA_SINTATICO;//posteriormente sera do tipo Atomo, declarado no ASDR
 InfoAtomo info_atomo;
 //############################### ANALISADOR SINTÁTICO ###############################
 
 void consome(Atomo atomo){ //Ver como posso fazer para consumir comentários
-    if(lookahead==atomo){
+    if(lookahead==atomo || lookahead == COMENTARIO){
         info_atomo = obter_atomo();
         lookahead=info_atomo.atomo;
     }
     else{
-        printf("#%d:Erro sintático:esperado [%s] encontrado [%s] \n",info_atomo.linha,msgAtomo[atomo],msgAtomo[lookahead]);
+        printf("#%d:Erro sintático: esperado [%s] encontrado [%s] \n", info_atomo.linha, msgAtomo[atomo], msgAtomo[lookahead]);
         exit(0); // Encerra execução
     }
 }
@@ -26,21 +26,21 @@ void consome(Atomo atomo){ //Ver como posso fazer para consumir comentários
 //Funções do analisador sintático:
 void programa(); 
 void bloco();
-void declaracao_de_variaveis(int i); //Coloca parâmetro i para calcular a profundidade na recursão em funções com recursividade
-void lista_variavel(int i); // O i é usado para obter um controle, a fim de evitar que a função seja chamada e não seja ignorada em caso de erro sintático
-void comando_composto(int i);
-void comando(int i);
-void comando_atribuicao(int i);
-void comando_condicional(int i);
-void comando_repeticao(int i);
-void comando_entrada(int i);
-void expressao(int i);
+void declaracao_de_variaveis();
+void lista_variavel(int i); 
+void comando_composto(); 
+void comando();
+void comando_atribuicao();
+void comando_condicional();
+void comando_repeticao();
+void comando_entrada();
+void expressao(int i); // O i é usado para obter um controle, a fim de evitar que a função seja chamada e não seja ignorada em caso de erro sintático
 void expressao_logica(int i);
-void expressao_relacional(int i);
-void op_relacional(int i);
+void expressao_relacional();
+void op_relacional();
 void expressao_simples(int i);
 void termo(int i);
-void fator(int i);
+void fator();
 
 /*
 <fator> ::= identificador | 
@@ -68,7 +68,7 @@ void fator()
     {
         fator(); //Chama fator
         consome(ABRE_PARENTESES); //Consome '('
-        expressao(); //Chama expressão
+        expressao(0); //Chama expressão
         consome(FECHA_PARENTESES); //Consome ')'
     }
 
@@ -77,55 +77,49 @@ void fator()
 }
 
 //<termo> ::= <fator> { ( “*” | “/” ) <fator> } 
-void termo()
+void termo(int i)
 {
-    //Se o próximo átomo a ser lido é um: identificador, número, true, false, not ou abre parênteses, quer dizer que deve-se chamar a função fator()
-    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    // Chama a primeira aparição de fator
+    if(i == 0)
     {
         fator();
-        termo(); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
+        termo(i + 1); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
     }
-    else if(lookahead == OP_MULT) //Se o próximo átomo é '*'
+    else if(lookahead == OP_MULT && i > 0) //Se o próximo átomo é '*'
     {
         consome(OP_MULT); //Consome o átomo '*'
         fator(); // Chama fator()
-        termo(); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
+        termo(i + 1); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
     }
-    else if(lookahead == OP_DIV) //Se o próximo átomo é '/'
+    else if(lookahead == OP_DIV && i > 0) //Se o próximo átomo é '/'
     {
         consome(OP_DIV); //Consome o átomo '/'
         fator();  // Chama fator()
-        termo(); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
+        termo(i + 1); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
     }
-
-    else //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado um identificador
-        consome(IDENTIFICADOR); 
 }
 
 // <expressao_simples> ::= <termo> { (“+” | “−” ) <termo> }
-void expressao_simples()
+void expressao_simples(int i)
 {
-    //Se o próximo átomo a ser lido é um: identificador, número, true, false, not ou abre parênteses, quer dizer que deve-se chamar a função termo()
-    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    // Chama a primeira aparição de termo
+    if(i == 0)
     {
-        termo(); //Chama termo()
-        expressao_simples(); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
+        termo(0); //Chama termo()
+        expressao_simples(i + 1); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
     }
-    else if(lookahead == OP_SOMA) //Se o próximo átomo é '+'
+    else if(lookahead == OP_SOMA && i > 0) //Se o próximo átomo é '+'
     {
         consome(OP_SOMA); //Consome o átomo '+'
-        termo(); //Chama termo()
-        expressao_simples(); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
+        termo(0); //Chama termo()
+        expressao_simples(i + 1); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
     }
-    else if(lookahead == OP_SUB) //Se o próximo átomo é '-'
+    else if(lookahead == OP_SUB && i > 0) //Se o próximo átomo é '-'
     {
         consome(OP_SUB); //Consome o átomo '-'
-        termo(); //Chama termo()
-        expressao_simples(); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
+        termo(0); //Chama termo()
+        expressao_simples(i + 1); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
     }
-
-    else //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado um identificador
-        consome(IDENTIFICADOR);
 }
 
 //<op_relacional> ::= “<” | “<=” | “=” | “/=” | “>” | “>=”
@@ -156,53 +150,48 @@ void op_relacional()
 //<expressão_relacional> ::= <expressao_simples> [<op_relacional> <expressao_simples>]
 void expressao_relacional()
 {
-     expressao_simples(); //Chama expressao_simples()
+     expressao_simples(0); //Chama expressao_simples()
     
     //Se o próximo átomo é algum operador relacional
     if(lookahead == OP_MENOR || lookahead == OP_MENOR_IGUAL || lookahead == OP_IGUAL || lookahead == OP_DIV_IGUAL || lookahead == OP_MAIOR || lookahead == OP_MAIOR_IGUAL)
     {
         op_relacional(); //Chama op_relacional()
-        expressao_simples(); //Chama expressao_simples()
+        expressao_simples(0); //Chama expressao_simples()
     }
 }
 
 //<expressao_logica>::= <expressao_relacional> { and <expressao_relacional> }
-void expressao_logica()
+void expressao_logica(int i)
 {
-    //Se o próximo átomo a ser lido é um: identificador, número, true, false, not ou abre parênteses, quer dizer que deve-se chamar a função expressao_relacional()
-    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    // Chama a primeira aparição de expressão relacional
+    if(i == 0)
     {
         expressao_relacional(); //Chama expressao_relacional()
-        expressao_logica(); //Chama expressao_logica recursivamente() para verificar existência de outra expressão relacional
+        expressao_logica(i + 1); //Chama expressao_logica recursivamente() para verificar existência de outra expressão relacional
     }
-    else if(lookahead == AND) // Se o próximo átomo é and:
+    else if(lookahead == AND && i > 0) // Se o próximo átomo é and:
     {
         consome(AND); //Consome and
         expressao_relacional(); //Chama expressao_relacional()
-        expressao_logica(); //Chama expressao_logica() recursivamente para verificar existência de outra expressão relacional
+        expressao_logica(i + 1); //Chama expressao_logica() recursivamente para verificar existência de outra expressão relacional
     }
-
-    else //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado um identificador
-        consome(IDENTIFICADOR); 
 }
 
 //<expressao> ::= <expressao_logica> { or <expressao_logica> }
-void expressao()
+void expressao(int i)
 {
-    //Se o próximo átomo a ser lido é um: identificador, número, true, false, not ou abre parênteses, quer dizer que deve-se chamar a função expressao_logica()
-    if(lookahead == IDENTIFICADOR || lookahead == NUMERO || lookahead == TRUE || lookahead == FALSE || lookahead == NOT || lookahead == ABRE_PARENTESES)
+    // Chama a primeira aparição de expressão lógica
+    if(i == 0)
     {
-        expressao_logica(); //Chama expressao_logica()
-        expressao(); //Chama expressao() recursivamente para verificar existência de outra expressão lógica
+        expressao_logica(0); //Chama expressao_logica()
+        expressao(i + 1); //Chama expressao() recursivamente para verificar existência de outra expressão lógica
     }
-    else if(lookahead == OR) // Se o próximo átomo é or:
+    else if(lookahead == OR && i > 0) // Se o próximo átomo é or:
     {
         consome(OR); //Consome or
-        expressao_logica(); //Chama expressao_logica()
-        expressao(); //Chama expressao() recursivamente para verificar existência de outra expressão lógica
+        expressao_logica(0); //Chama expressao_logica()
+        expressao(i + 1); //Chama expressao() recursivamente para verificar existência de outra expressão lógica
     }
-    else //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado um identificador
-        consome(IDENTIFICADOR); 
 }
 
 //<comando_repeticao> ::= for identificador of <expressão> to <expressão> “:” <comando>
@@ -211,11 +200,16 @@ void comando_repeticao() //Comando de laço for
     consome(FOR);
     consome(IDENTIFICADOR); //Consome átomos
     consome(TO);
-    expressao(); //Chama expressao() para ler a expressão de condição do for
+    expressao(0); //Chama expressao() para ler a expressão de condição do for
     consome(TO);
-    expressao(); //Chama expressao() para ler a expressão de condição do for
+    expressao(0); //Chama expressao() para ler a expressão de condição do for
     consome(DOIS_PONTOS);
     comando(); //Chama expressao() para ler o comando aninhado ao for
+
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+    }
 }
 
 //<comando_entrada> ::= read “(“ <lista_variavel> “)”
@@ -223,8 +217,13 @@ void comando_entrada() //Comando para ler listas de variáveis
 {
     consome(READ);
     consome(ABRE_PARENTESES);
-    lista_variavel(); // Chama lista_variavel() para ler a lista de variáveis
+    lista_variavel(0); // Chama lista_variavel() para ler a lista de variáveis
     consome(FECHA_PARENTESES);
+
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+    }
 }
 
 //<comando_saida> ::= write “(“ <expressao> { “,” <expressao> } “)”
@@ -234,19 +233,24 @@ void comando_saida()
     {
         consome(WRITE); //Consome átomos write e '('
         consome(ABRE_PARENTESES);
-        expressao(); //Chama expressao()
+        expressao(0); //Chama expressao()
         comando_saida(); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
     else if(lookahead == VIRGULA) // Se o próximo átomo é vírgula
     {
         consome(VIRGULA); //Consome vírgula
-        expressao(); //Chama expressao()
+        expressao(0); //Chama expressao()
         comando_saida(); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
     else //Se encontra qualquer outro átomo consome ')' (se o átomo não for ')', gera-se erro)
         consome(FECHA_PARENTESES);
+    
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+    }
 
     
 }
@@ -257,14 +261,22 @@ void comando_condicional()
     if(lookahead == IF) //Se o próximo átomo é um if:
     {
         consome(IF); //Consome if, consome condição e dois pontos
-        expressao();
+        expressao(0);
         consome(DOIS_PONTOS);
         comando(); // Chama comando()
+    }
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
     }
     if(lookahead == ELIF) //Caso o if seja seguido de um elif:
     {
         consome(ELIF); // Consome elif e chama comando()
         comando();
+    }
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
     }
 }
 
@@ -274,7 +286,12 @@ void comando_atribuicao()
     consome(SET); //Consome átomos e lê expressão
     consome(IDENTIFICADOR);
     consome(TO);
-    expressao();
+    expressao(0);
+
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+    }
 }
 
 /*
@@ -305,25 +322,35 @@ void comando()
     else if(lookahead == BEGIN) //Se o próximo átomo a ser consumido é begin, é porque se trata de um comando composto
         comando_composto(); 
     
+    else if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+        comando();
+    }
     else //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado o átomo begin
         consome(BEGIN); 
 }
 
 //<comando_composto> ::= begin <comando> {“;”<comando>} end
-void comando_composto(int i)
+void comando_composto()
 {
     if(lookahead == BEGIN) //Se o próximo átomo é begin:
     {
         consome(BEGIN); //Consome begin e chama comando() para ler o comando aninhado
         comando();
-        comando_composto(i + 1); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
+        comando_composto(); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
     }
-    
+
+    else if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+        comando_composto();
+    }
     else if(lookahead == PONTO_VIRGULA) //se o próximo átomo é ';', é porque ainda há mais um comando
     {
         consome(PONTO_VIRGULA); //Consome ';' e chama comando()
         comando();
-        comando_composto(i + 1); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
+        comando_composto(); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
     }
     
     else //Se qualquer outro átomo é lido, tenta consumir end (caso o átomo não seja end, gera-se erro)
@@ -334,45 +361,50 @@ void comando_composto(int i)
 //<lista_variavel> ::= identificador { “,” identificador }
 void lista_variavel(int i)
 {
-    switch (lookahead)
+    if(i == 0)
     {
-    case IDENTIFICADOR: //Se o próximo átomo é um identificador: consome identificador
         consome(IDENTIFICADOR);
         lista_variavel(i + 1); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
-        break;
+    }
     
-    case VIRGULA: //Se o próximo átomo é ',': consome a ',' e o identificador seguinte
+    else if(lookahead == VIRGULA && i > 0) //Se o próximo átomo é ',': consome a ',' e o identificador seguinte
+    {
         consome(VIRGULA);
         consome(IDENTIFICADOR);
         lista_variavel(i + 1); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
-    
-    default: //Se lê qualquer outro átomo, dá erro sintático e informa que era esperado um identificador
-    consome(IDENTIFICADOR);
-        break;
+    }
+
+    if(lookahead == COMENTARIO)
+    {
+        consome(COMENTARIO);
+        lista_variavel(i + 1);
     }
 }
 
 //<declaracao_de_variaveis> ::= {<tipo> <lista_variavel> “;”}
-void declaracao_de_variaveis(int i)
+void declaracao_de_variaveis()
 {
     switch (lookahead)
     {
     case INTEGER: //Se o próximo átomo é integer, então a lista contém variaveis do tipo integer
         consome(INTEGER); //consome integer
-        lista_variavel(); //Lê lista de variáveis
+        lista_variavel(0); //Lê lista de variáveis
         consome(PONTO_VIRGULA); //Consome ';'
-        declaracao_de_variaveis(i + 1); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
+        declaracao_de_variaveis(); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
         break;
     
     case BOOLEAN: //Se o próximo átomo é boolean, então a lista contém variaveis do tipo boolean
         consome(BOOLEAN); //consome boolean
-        lista_variavel(); //Lê lista de variáveis
+        lista_variavel(0); //Lê lista de variáveis
         consome(PONTO_VIRGULA); //Consome ';'
-        declaracao_de_variaveis(i + 1); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
+        declaracao_de_variaveis(); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
         break;
     
+    case COMENTARIO:
+        consome(COMENTARIO);
+        declaracao_de_variaveis();
+
     default:
-        consome(INTEGER);
         break;
     }
 }
@@ -380,15 +412,27 @@ void declaracao_de_variaveis(int i)
 //<bloco>::= <declaracao_de_variaveis> <comando_composto>
 void bloco()
 {
+    if(lookahead == COMENTARIO)
+        consome(COMENTARIO);
+
     declaracao_de_variaveis();
+
+    if(lookahead == COMENTARIO)
+        consome(COMENTARIO);
+
     comando_composto();
+
+    if(lookahead == COMENTARIO)
+        consome(COMENTARIO);
 }
 
 //<programa> ::= program identificador “;” <bloco> “.”
 void programa()
 {
-    info_atomo = obter_atomo(); //Obtém átomo inicial
-    lookahead = info_atomo.atomo;
+    consome(INICIA_SINTATICO); //Obtém átomo inicial
+
+    if(lookahead == COMENTARIO)
+        consome(COMENTARIO);
 
     switch (lookahead)
     {
@@ -396,14 +440,22 @@ void programa()
         consome(PROGRAM); //inicia a leitura do programa consumindo os próximos átomos
         consome(IDENTIFICADOR);
         consome(PONTO_VIRGULA);
+
+        if(lookahead == COMENTARIO)
+            consome(COMENTARIO);
+
         bloco(); // Chama o bloco
         consome(PONTO); //Quando chega ao ponto final, consome ponto e o átomo EOF_BUFFER
+
+        if(lookahead == COMENTARIO)
+            consome(COMENTARIO);
+
         consome(EOF_BUFFER);
         printf("%d linhas analisadas, programa sintaticamente correto\n", info_atomo.linha); //Encerra análise sintática corretamente
         break;
 
-    default: //Arrumar isto (para identificar átomos de comentário)
-        
+    default: 
+        consome(PROGRAM); //Quando o átomo incial é outro diferente de program, gera erro
         break;
     }
 

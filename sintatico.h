@@ -206,10 +206,8 @@ void comando_repeticao() //Comando de laço for
     consome(DOIS_PONTOS);
     comando(); //Chama expressao() para ler o comando aninhado ao for
 
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
 }
 
 //<comando_entrada> ::= read “(“ <lista_variavel> “)”
@@ -220,10 +218,8 @@ void comando_entrada() //Comando para ler listas de variáveis
     lista_variavel(0); // Chama lista_variavel() para ler a lista de variáveis
     consome(FECHA_PARENTESES);
 
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
 }
 
 //<comando_saida> ::= write “(“ <expressao> { “,” <expressao> } “)”
@@ -247,12 +243,8 @@ void comando_saida()
     else //Se encontra qualquer outro átomo consome ')' (se o átomo não for ')', gera-se erro)
         consome(FECHA_PARENTESES);
     
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
-
-    
 }
 
 //<comando_condicional> ::= if <expressao> “:” <comando> [elif <comando>]
@@ -265,19 +257,16 @@ void comando_condicional()
         consome(DOIS_PONTOS);
         comando(); // Chama comando()
     }
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
+
     if(lookahead == ELIF) //Caso o if seja seguido de um elif:
     {
         consome(ELIF); // Consome elif e chama comando()
         comando();
     }
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
 }
 
 //<comando_atribuicao> ::= set identificador to <expressao>
@@ -288,10 +277,8 @@ void comando_atribuicao()
     consome(TO);
     expressao(0);
 
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-    }
 }
 
 /*
@@ -374,11 +361,9 @@ void lista_variavel(int i)
         lista_variavel(i + 1); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
 
-    if(lookahead == COMENTARIO)
-    {
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
-        lista_variavel(i + 1);
-    }
+
 }
 
 //<declaracao_de_variaveis> ::= {<tipo> <lista_variavel> “;”}
@@ -399,30 +384,29 @@ void declaracao_de_variaveis()
         consome(PONTO_VIRGULA); //Consome ';'
         declaracao_de_variaveis(); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
         break;
-    
-    case COMENTARIO:
-        consome(COMENTARIO);
-        declaracao_de_variaveis();
 
     default:
         break;
     }
+
+    while(lookahead == COMENTARIO)
+        consome(COMENTARIO);
 }
 
 //<bloco>::= <declaracao_de_variaveis> <comando_composto>
 void bloco()
 {
-    if(lookahead == COMENTARIO)
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
 
     declaracao_de_variaveis();
 
-    if(lookahead == COMENTARIO)
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
 
     comando_composto();
 
-    if(lookahead == COMENTARIO)
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
 }
 
@@ -431,20 +415,20 @@ void programa()
 {
     consome(INICIA_SINTATICO); //Obtém átomo inicial
 
-    if(lookahead == COMENTARIO)
+    while(lookahead == COMENTARIO)
         consome(COMENTARIO);
 
         consome(PROGRAM); //inicia a leitura do programa consumindo os próximos átomos
         consome(IDENTIFICADOR);
         consome(PONTO_VIRGULA);
 
-        if(lookahead == COMENTARIO)
+        while(lookahead == COMENTARIO)
             consome(COMENTARIO);
 
         bloco(); // Chama o bloco
         consome(PONTO); //Quando chega ao ponto final, consome ponto e o átomo EOF_BUFFER
 
-        if(lookahead == COMENTARIO)
+        while(lookahead == COMENTARIO)
             consome(COMENTARIO);
 
         consome(EOF_BUFFER);

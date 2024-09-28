@@ -87,12 +87,12 @@ char *msgAtomo[] = {
     "TRUE",
     "WRITE",
 
-    ",", //Sinais de "pontuação"
-    ";",
-    ".",
-    ":",
-    "(",
-    ")"
+    "VÍRGULA", //Sinais de "pontuação"
+    "PONTO VÍRGULA",
+    "PONTO",
+    "DOIS PONTOS",
+    "ABRE PARÊNTESES",
+    "FECHA PARÊNTESES"
 };
 
 typedef struct InfoAtomo{ //atributos do átomo

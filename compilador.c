@@ -13,14 +13,6 @@
 //Executar o arquivo:
 //./compilador entrada.txt
 
-/* TODO:
-    1) Descobrir um modo de fazer com que o código ignore os comentários ✅
-    2) Comentar o código ✅
-    3) Elaborar um README.md
-    4) Criar outros casos teste
-    5) Implementar parâmetro de controle i nas funções com recursividade do analisador sintático ✅
-*/
-
 int main(int argc, char *argv[])
 {
     if(le_arquivo(argv[1])) //Lê arquivo de entrada

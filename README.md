@@ -1,3 +1,8 @@
+# Integrantes
+
+## David Varão Lima Bentes Pessoa   RA: 10402647
+## João Pedro de Souza Costa Ferreira RA: 10400720
+
 # Projeto Compiladores
 
 ## Introdução

@@ -1,3 +1,5 @@
+//David Varão Lima Bentes Pessoa  10402647
+//João Pedro de Souza Costa Ferreira  10400720
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

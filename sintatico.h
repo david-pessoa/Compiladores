@@ -8,7 +8,7 @@
 
 #ifndef LOOKAHEAD_H
 #define LOOKAHEAD_H
-Atomo lookahead = INICIA_SINTATICO;//posteriormente sera do tipo Atomo, declarado no ASDR
+Atomo lookahead = INICIA_SINTATICO; //Inicia lookahead
 InfoAtomo info_atomo;
 //############################### ANALISADOR SINTÁTICO ###############################
 
@@ -434,9 +434,6 @@ void programa()
     if(lookahead == COMENTARIO)
         consome(COMENTARIO);
 
-    switch (lookahead)
-    {
-    case PROGRAM: //Se o átomo inicial for PROGRAM
         consome(PROGRAM); //inicia a leitura do programa consumindo os próximos átomos
         consome(IDENTIFICADOR);
         consome(PONTO_VIRGULA);
@@ -452,12 +449,6 @@ void programa()
 
         consome(EOF_BUFFER);
         printf("%d linhas analisadas, programa sintaticamente correto\n", info_atomo.linha); //Encerra análise sintática corretamente
-        break;
-
-    default: 
-        consome(PROGRAM); //Quando o átomo incial é outro diferente de program, gera erro
-        break;
-    }
 
 }
 #endif

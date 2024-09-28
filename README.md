@@ -6,6 +6,11 @@ Já o arquivo `atomo.h` define os tipos que um `Atomo` pode assumir (Identificad
 Como já é possível notar, os módulos `lexico.h` e `sintatico.h`, carregam as funções do analisador léxico e sintático respectivamente. Eles serão melhor apresentados nas seções seguintes.
 
 ## Analisador Léxico
+É no analisador léxico que será lido o programa armazenado na string `buffer`, a contagem de linhas e a identificação de átomos do programa. Ele é chamado pelo analisador sintático para obter os átomos do programa. Para isso, foi criada a função `obter_atomo()` que retorna o próximo átomo obtido do programa no tipo `InfoAtomo`, para armazenar as informações do `Atomo`.    
+
+A fim de identificar o `Atomo`, a função ignora caracteres como: ' ', '\t', '\r' e '\n' (quando passa por este último é feita a contagem de uma linha). Depois, verifica-se se o que está sendo lido é um identificador ou palavra reservada (caso seja identificada uma letra minúscula ao início do átomo) por meio da função `reconhece_palavra()`. Caso o átomo comece com `0b`, provavelmente se trata de um número, então é chamada a função `reconhece_numero()` para reconhecê-lo e realizar sua conversão para o formato decimal. Há também a possibilidade de que venha em seguida um comentário de uma linha (inciando com '#') ou de múltiplas linhas (iniciando com '{-' e finalindo com '-}'). Para essas situações, criamos as funções `ignora_comentario()` e `ignora_comentario_multiplas_linhas()` respectivamente. Todas estas funções retornam um struct do tipo `InfoAtomo`, sendo que `reconhece_numero()`utiliza o atributo `numero` de `InfoAtomo` para guardar o número obtido (em caso de êxito) e `reconhece_palavra()`, caso reconheça um identificador, guarda o identificador lido em `atributo_ID`. Além disso, há também a identificação de outros átomos que são operadores matemáticos, relacionais entre outros como: (',', ';', '.', ':', etc.).    
+
+Se a mensagem chega ao fim, é identificado o `Atomo` `EOF_BUFFER`, caso não seja identificado nenhum dos átomos mencionados anteriormente durante a leitura do arquivo, o programa retorna uma mensagem indicando um erro léxico e encerra imediatamente. Após a identificação do `Atomo`, é feita a sua impressão ao final da função `obter_atomo()` que será então retornado pela função, para que o analisador léxico possa análisá-lo.
 
 ## Analisador Sintático
 

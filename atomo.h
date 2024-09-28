@@ -1,3 +1,6 @@
+//David Varão Lima Bentes Pessoa  10402647
+//João Pedro de Souza Costa Ferreira  10400720
+
 #ifndef ATOMO_H    // Verifica se ATOMO_H ainda não foi definido
 #define ATOMO_H    // Define ATOMO_H para evitar múltiplas inclusões
 

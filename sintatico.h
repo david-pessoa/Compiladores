@@ -434,7 +434,6 @@ void programa()
         while(lookahead == COMENTARIO)
             consome(COMENTARIO);
 
-        consome(EOF_BUFFER);
         printf("%d linhas analisadas, programa sintaticamente correto\n", info_atomo.linha); //Encerra análise sintática corretamente
 
 }

@@ -17,7 +17,7 @@ InfoAtomo info_atomo;
 
 void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é o átomo obtido
     if(lookahead==atomo){
-        info_atomo = obter_atomo(); //Caso seja, obtém próximo átomo
+        info_atomo = obter_atomo(); //Caso o átomo esperado é o átomo obtido, obtém próximo átomo
         lookahead=info_atomo.atomo;
     }
     else{ //Senão, exibe erro sintático mostrando o átomo esperado e o obtido
@@ -31,12 +31,13 @@ void programa();
 void bloco();
 void declaracao_de_variaveis();
 void lista_variavel(int i); 
-void comando_composto(); 
+void comando_composto(int i); 
 void comando();
 void comando_atribuicao();
 void comando_condicional();
 void comando_repeticao();
 void comando_entrada();
+void comando_saida(int i);
 void expressao(int i); // O i é usado para obter um controle, a fim de evitar que a função seja chamada e não seja ignorada em caso de erro sintático
 void expressao_logica(int i);
 void expressao_relacional();
@@ -226,21 +227,21 @@ void comando_entrada() //Comando para ler listas de variáveis
 }
 
 //<comando_saida> ::= write “(“ <expressao> { “,” <expressao> } “)”
-void comando_saida()
+void comando_saida(int i)
 {
-    if (lookahead == WRITE) // Se o próximo átomo é write
+    if (i == 0) // Se o próximo átomo é write
     {
         consome(WRITE); //Consome átomos write e '('
         consome(ABRE_PARENTESES);
         expressao(0); //Chama expressao()
-        comando_saida(); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
+        comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
-    else if(lookahead == VIRGULA) // Se o próximo átomo é vírgula
+    else if(lookahead == VIRGULA && i > 0) // Se o próximo átomo é vírgula
     {
         consome(VIRGULA); //Consome vírgula
         expressao(0); //Chama expressao()
-        comando_saida(); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
+        comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
     else //Se encontra qualquer outro átomo consome ')' (se o átomo não for ')', gera-se erro)
@@ -307,10 +308,10 @@ void comando()
         comando_entrada(); 
     
     else if(lookahead == WRITE) //Se o próximo átomo a ser consumido é write, é porque se trata de um comando de saída
-        comando_saida();
+        comando_saida(0);
     
     else if(lookahead == BEGIN) //Se o próximo átomo a ser consumido é begin, é porque se trata de um comando composto
-        comando_composto(); 
+        comando_composto(0); 
     
     else if(lookahead == COMENTARIO)
     {
@@ -322,25 +323,19 @@ void comando()
 }
 
 //<comando_composto> ::= begin <comando> {“;”<comando>} end
-void comando_composto()
+void comando_composto(int i)
 {
-    if(lookahead == BEGIN) //Se o próximo átomo é begin:
+    if(i == 0) //Se o próximo átomo é begin:
     {
         consome(BEGIN); //Consome begin e chama comando() para ler o comando aninhado
         comando();
-        comando_composto(); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
+        comando_composto(i + 1); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
     }
-
-    else if(lookahead == COMENTARIO)
-    {
-        consome(COMENTARIO);
-        comando_composto();
-    }
-    else if(lookahead == PONTO_VIRGULA) //se o próximo átomo é ';', é porque ainda há mais um comando
+    else if(lookahead == PONTO_VIRGULA && i > 0) //se o próximo átomo é ';', é porque ainda há mais um comando
     {
         consome(PONTO_VIRGULA); //Consome ';' e chama comando()
         comando();
-        comando_composto(); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
+        comando_composto(i + 1); //Chama comando_composto() recursivamente para verificar se o comando composto acabou ou não
     }
     
     else //Se qualquer outro átomo é lido, tenta consumir end (caso o átomo não seja end, gera-se erro)
@@ -372,6 +367,9 @@ void lista_variavel(int i)
 //<declaracao_de_variaveis> ::= {<tipo> <lista_variavel> “;”}
 void declaracao_de_variaveis()
 {
+    while(lookahead == COMENTARIO)
+        consome(COMENTARIO);
+        
     switch (lookahead)
     {
     case INTEGER: //Se o próximo átomo é integer, então a lista contém variaveis do tipo integer
@@ -392,8 +390,6 @@ void declaracao_de_variaveis()
         break;
     }
 
-    while(lookahead == COMENTARIO)
-        consome(COMENTARIO);
 }
 
 //<bloco>::= <declaracao_de_variaveis> <comando_composto>
@@ -407,7 +403,7 @@ void bloco()
     while(lookahead == COMENTARIO)
         consome(COMENTARIO);
 
-    comando_composto();
+    comando_composto(0);
 
     while(lookahead == COMENTARIO)
         consome(COMENTARIO);

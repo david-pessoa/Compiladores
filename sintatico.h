@@ -15,12 +15,12 @@ Atomo lookahead = INICIA_SINTATICO; //Inicia lookahead
 InfoAtomo info_atomo;
 //############################### ANALISADOR SINTÁTICO ###############################
 
-void consome(Atomo atomo){ //Ver como posso fazer para consumir comentários
-    if(lookahead==atomo || lookahead == COMENTARIO){
-        info_atomo = obter_atomo();
+void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é o átomo obtido
+    if(lookahead==atomo){
+        info_atomo = obter_atomo(); //Caso seja, obtém próximo átomo
         lookahead=info_atomo.atomo;
     }
-    else{
+    else{ //Senão, exibe erro sintático mostrando o átomo esperado e o obtido
         printf("#%d:Erro sintático: esperado [%s] encontrado [%s] \n", info_atomo.linha, msgAtomo[atomo], msgAtomo[lookahead]);
         exit(0); // Encerra execução
     }

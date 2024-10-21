@@ -115,7 +115,7 @@ InfoAtomo reconhece_palavra(){
         tamanho++;
         buffer++;
     }
-    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.')
+    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != '\r' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.')
     {
         info_atomo.atomo = ERRO; //Caso apareça algum caractere inesperado, gera erro léxico
         strcpy(info_atomo.mensagem_erro, "Erro léxico: identificador inválido!");

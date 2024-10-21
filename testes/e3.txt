@@ -1,0 +1,11 @@
+program e3;
+integer x, y ;
+boolean iguais;
+begin1
+  read(x, y);
+  if x = y:
+    set iguais to true
+  elif
+    set iguais to false;
+  write(iguais)
+end.

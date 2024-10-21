@@ -1,0 +1,13 @@
+program t1;
+{- comentario
+-}
+integer a, b, maior;
+begin #teste
+  read(a, b);
+  if a > b:
+    set maior to a
+  elif
+    set maior to b;
+  write(maior)
+  
+end.

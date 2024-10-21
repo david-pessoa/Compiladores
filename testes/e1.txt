@@ -1,0 +1,8 @@
+program e1;
+{--}
+#teste
+begin
+    write(a);;;;
+	set a to 0b101
+	;;;;
+end.

@@ -70,7 +70,12 @@ void fator()
     
     else if(lookahead == NOT) //Se lê not:
     {
+        consome(NOT);
         fator(); //Chama fator
+    }
+
+    else if(lookahead == ABRE_PARENTESES) //Se lê abre parênteses
+    {
         consome(ABRE_PARENTESES); //Consome '('
         expressao(0); //Chama expressão
         consome(FECHA_PARENTESES); //Consome ')'
@@ -203,7 +208,7 @@ void comando_repeticao() //Comando de laço for
 {
     consome(FOR);
     consome(IDENTIFICADOR); //Consome átomos
-    consome(TO);
+    consome(OF);
     expressao(0); //Chama expressao() para ler a expressão de condição do for
     consome(TO);
     expressao(0); //Chama expressao() para ler a expressão de condição do for

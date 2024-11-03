@@ -40,12 +40,35 @@ bool add_na_tabela(char var[]) // retorna o resultado de confere_tabela() para o
 
 }
 
-void inicia_tabela()
+void inicia_tabela() //Inicia a tabela de símbolos colocando cadeia vazia '\0' em todos os elementos do vetor
 {
     for (int i = 0; i < MAX; i++) {
         tabela_de_simbolos[i] = malloc(15 * sizeof(char)); // Cada string pode ter até 49 caracteres + '\0'
         if (tabela_de_simbolos[i] != NULL) {
             memset(tabela_de_simbolos[i], '\0', 15); // Inicializa com '\0'
+        }
+    }
+}
+
+void verifica_semantica(bool checa) //Realiza a análise semântica dentro da função <lista_variavel>
+{
+    bool result;
+    if(checa) // Se está dentro de <declaracao_de_variaveis>:
+    {
+        result = add_na_tabela(info_atomo.atributo_ID);
+        if(result)
+        {
+            printf("#%d Erro semântico: variável '%s' já foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+            exit(0);
+        }
+    }
+    else //Se está no corpo do programa:
+    {
+        result = confere_tabela(info_atomo.atributo_ID);
+        if(!result)
+        {
+            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+            exit(0);
         }
     }
 }
@@ -389,6 +412,7 @@ void lista_variavel(int i, bool checa) //checa == true se está em <declaracao_d
 {
     if(i == 0)
     {
+        verifica_semantica(checa); //Realiza análise semântica
         consome(IDENTIFICADOR);
         lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
@@ -396,26 +420,7 @@ void lista_variavel(int i, bool checa) //checa == true se está em <declaracao_d
     else if(lookahead == VIRGULA && i > 0) //Se o próximo átomo é ',': consome a ',' e o identificador seguinte
     {
         consome(VIRGULA);
-        bool result;
-        if(checa) // Se está dentro de <declaracao_de_variaveis>:
-        {
-            result = add_na_tabela(info_atomo.atributo_ID);
-            if(result)
-            {
-                printf("#%d Erro semântico: variável '%s' já foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-                exit(0);
-            }
-        }
-        else //Se está no corpo do programa:
-        {
-            result = confere_tabela(info_atomo.atributo_ID);
-            if(!result)
-            {
-                printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-                exit(0);
-            }
-        }
-
+        verifica_semantica(checa); //Realiza análise semântica
         consome(IDENTIFICADOR);
         lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }

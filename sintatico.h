@@ -55,8 +55,8 @@ void verifica_semantica(bool checa) //Realiza a análise semântica dentro da fu
     bool result;
     if(checa) // Se está dentro de <declaracao_de_variaveis>:
     {
-        result = add_na_tabela(info_atomo.atributo_ID);
-        if(result)
+        result = add_na_tabela(info_atomo.atributo_ID); //Tenta adicionar variável na tabela
+        if(result) //Se ela já existir:
         {
             printf("#%d Erro semântico: variável '%s' já foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
             exit(0);
@@ -64,8 +64,8 @@ void verifica_semantica(bool checa) //Realiza a análise semântica dentro da fu
     }
     else //Se está no corpo do programa:
     {
-        result = confere_tabela(info_atomo.atributo_ID);
-        if(!result)
+        result = confere_tabela(info_atomo.atributo_ID); //Confere se a variável existe na tabela
+        if(!result) //Se ela não existir:
         {
             printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
             exit(0);

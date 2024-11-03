@@ -1,5 +1,5 @@
 //David Varão Lima Bentes Pessoa  10402647
-//João Pedro de Souza Costa Ferreira  10400720
+//João Victor Dallapé Madeira 10400725
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,10 +11,46 @@
 
 #ifndef LOOKAHEAD_H
 #define LOOKAHEAD_H
+#define MAX 20 //Máximo de variáveis suportado pela tabela de símbolos
+
+char *tabela_de_simbolos[MAX]; //Cria tabela de símbolos
+int index_tabela = 0; //Inicializa indíce da tabela em 0
 Atomo lookahead = INICIA_SINTATICO; //Inicia lookahead
 InfoAtomo info_atomo;
-//############################### ANALISADOR SINTÁTICO ###############################
 
+//############################### ANALISADOR SEMÂNTICO ###############################
+bool confere_tabela(char var[]) //Retorna true se a variável está na tabela e false caso contrário
+{
+    for (int i = 0; i < MAX; i++) 
+    {
+        if(strcmp(tabela_de_simbolos[i], var) == 0)
+            return true;
+    }
+    return false;
+}
+
+
+bool add_na_tabela(char var[]) // retorna o resultado de confere_tabela() para o parâmetro passado e tenta adicionar a variável na tabela
+{   
+    bool result = confere_tabela(var);
+    if(!result)
+        strcpy(tabela_de_simbolos[index_tabela++], var);
+    
+    return result;
+
+}
+
+void inicia_tabela()
+{
+    for (int i = 0; i < MAX; i++) {
+        tabela_de_simbolos[i] = malloc(15 * sizeof(char)); // Cada string pode ter até 49 caracteres + '\0'
+        if (tabela_de_simbolos[i] != NULL) {
+            memset(tabela_de_simbolos[i], '\0', 15); // Inicializa com '\0'
+        }
+    }
+}
+
+//############################### ANALISADOR SINTÁTICO ###############################
 void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é o átomo obtido
     if(lookahead==atomo){
         info_atomo = obter_atomo(); //Caso o átomo esperado é o átomo obtido, obtém próximo átomo
@@ -30,7 +66,7 @@ void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é
 void programa(); 
 void bloco();
 void declaracao_de_variaveis();
-void lista_variavel(int i); 
+void lista_variavel(int i, bool checa); 
 void comando_composto(int i); 
 void comando();
 void comando_atribuicao();
@@ -224,7 +260,7 @@ void comando_entrada() //Comando para ler listas de variáveis
 {
     consome(READ);
     consome(ABRE_PARENTESES);
-    lista_variavel(0); // Chama lista_variavel() para ler a lista de variáveis
+    lista_variavel(0, false); // Chama lista_variavel() para ler a lista de variáveis
     consome(FECHA_PARENTESES);
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
@@ -349,19 +385,39 @@ void comando_composto(int i)
 }
 
 //<lista_variavel> ::= identificador { “,” identificador }
-void lista_variavel(int i)
+void lista_variavel(int i, bool checa) //checa == true se está em <declaracao_de_variaveis>, checa == false caso contrário
 {
     if(i == 0)
     {
         consome(IDENTIFICADOR);
-        lista_variavel(i + 1); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
+        lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
     
     else if(lookahead == VIRGULA && i > 0) //Se o próximo átomo é ',': consome a ',' e o identificador seguinte
     {
         consome(VIRGULA);
+        bool result;
+        if(checa) // Se está dentro de <declaracao_de_variaveis>:
+        {
+            result = add_na_tabela(info_atomo.atributo_ID);
+            if(result)
+            {
+                printf("#%d Erro semântico: variável '%s' já foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+                exit(0);
+            }
+        }
+        else //Se está no corpo do programa:
+        {
+            result = confere_tabela(info_atomo.atributo_ID);
+            if(!result)
+            {
+                printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+                exit(0);
+            }
+        }
+
         consome(IDENTIFICADOR);
-        lista_variavel(i + 1); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
+        lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
@@ -379,14 +435,14 @@ void declaracao_de_variaveis()
     {
     case INTEGER: //Se o próximo átomo é integer, então a lista contém variaveis do tipo integer
         consome(INTEGER); //consome integer
-        lista_variavel(0); //Lê lista de variáveis
+        lista_variavel(0, true); //Lê lista de variáveis
         consome(PONTO_VIRGULA); //Consome ';'
         declaracao_de_variaveis(); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
         break;
     
     case BOOLEAN: //Se o próximo átomo é boolean, então a lista contém variaveis do tipo boolean
         consome(BOOLEAN); //consome boolean
-        lista_variavel(0); //Lê lista de variáveis
+        lista_variavel(0, true); //Lê lista de variáveis
         consome(PONTO_VIRGULA); //Consome ';'
         declaracao_de_variaveis(); //Chama declaracao_de_variaveis() recursivamente para verificar se há mais declarações de variáveis a serem feitas
         break;
@@ -418,6 +474,7 @@ void bloco()
 void programa()
 {
     consome(INICIA_SINTATICO); //Obtém átomo inicial
+    inicia_tabela();
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário

@@ -11,7 +11,7 @@
 
 #ifndef LOOKAHEAD_H
 #define LOOKAHEAD_H
-#define MAX 20 //Máximo de variáveis suportado pela tabela de símbolos
+#define MAX 20 //Máximo de variáveis suportado pela tabela de símbolos (1+a)-(3/1*9)
 
 char *tabela_de_simbolos[MAX]; //Cria tabela de símbolos
 int index_tabela = 0; //Inicializa indíce da tabela em 0
@@ -78,6 +78,8 @@ void show_tabela() //Exibe tabela de símbolos
     printf("\n\tTABELA DE SIMBOLOS\n");
     for (int i = 0; i < MAX; i++) 
     {
+        if(strcmp(tabela_de_simbolos[i], "\0")  == 0)
+            break;
         printf("%-15s | Endereço: %d\n", tabela_de_simbolos[i], i);
     }
 }
@@ -125,10 +127,15 @@ not <fator>   |
 void fator()
 {
     if(lookahead == IDENTIFICADOR) //Se lê identificador, consome identificador
+    {    
+        printf("CRVL %s\n", info_atomo.atributo_ID);
         consome(IDENTIFICADOR);
+    }
 
     else if(lookahead == NUMERO) //Se lê número, consome número
+    {   printf("CRCT %d\n", info_atomo.numero);
         consome(NUMERO);
+    }
     
     else if(lookahead == TRUE) //Se lê true, consome true
         consome(TRUE);
@@ -166,12 +173,14 @@ void termo(int i)
     {
         consome(OP_MULT); //Consome o átomo '*'
         fator(); // Chama fator()
+        printf("MULT\n");
         termo(i + 1); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
     }
     else if(lookahead == OP_DIV && i > 0) //Se o próximo átomo é '/'
     {
         consome(OP_DIV); //Consome o átomo '/'
         fator();  // Chama fator()
+        printf("DIVI\n");
         termo(i + 1); //Chama termo() recursivamente para verificar se há átomos de '*' ou '/'
     }
 }
@@ -189,12 +198,14 @@ void expressao_simples(int i)
     {
         consome(OP_SOMA); //Consome o átomo '+'
         termo(0); //Chama termo()
+        printf("SOMA\n");
         expressao_simples(i + 1); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
     }
     else if(lookahead == OP_SUB && i > 0) //Se o próximo átomo é '-'
     {
         consome(OP_SUB); //Consome o átomo '-'
         termo(0); //Chama termo()
+        printf("SUBT\n");
         expressao_simples(i + 1); //Chama expressao_simples() recursivamente para verificar se há átomos de '+' ou '-'
     }
 }

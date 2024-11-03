@@ -73,6 +73,15 @@ void verifica_semantica(bool checa) //Realiza a análise semântica dentro da fu
     }
 }
 
+void show_tabela() //Exibe tabela de símbolos
+{
+    printf("\n\tTABELA DE SIMBOLOS\n");
+    for (int i = 0; i < MAX; i++) 
+    {
+        printf("%-15s | Endereço: %d\n", tabela_de_simbolos[i], i);
+    }
+}
+
 //############################### ANALISADOR SINTÁTICO ###############################
 void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é o átomo obtido
     if(lookahead==atomo){
@@ -496,8 +505,7 @@ void programa()
 
         while(lookahead == COMENTARIO) //Verifica se há comentários
             consome(COMENTARIO); //Consome comentário
-
-        printf("%d linhas analisadas, programa sintaticamente correto\n", info_atomo.linha); //Encerra análise sintática corretamente
-
+    
+    show_tabela();
 }
 #endif

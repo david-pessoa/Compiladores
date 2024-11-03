@@ -362,20 +362,11 @@ InfoAtomo obter_atomo(){
         strcpy(info_atomo.mensagem_erro, "Erro léxico: não foi possível identificar o átomo");
     }
 
-    if( info_atomo.atomo == IDENTIFICADOR) //Imprime mensagem ao identificar átomo do tipo identificador
-        printf("%03d# %s | %s\n",info_atomo.linha,msgAtomo[info_atomo.atomo], info_atomo.atributo_ID);
-        
-    else if (info_atomo.atomo == NUMERO) //Imprime mensagem ao identificar átomo do tipo NUMERO
-        printf("%03d# %s | %d\n", info_atomo.linha, msgAtomo[info_atomo.atomo], info_atomo.numero);
-
-    else if (info_atomo.atomo == ERRO) //Imprime mensagem quando encontra erro léxico
+    if( info_atomo.atomo == ERRO) //Imprime mensagem ao identificar átomo do tipo identificador
     {
         printf("%03d# %s\n",info_atomo.linha, info_atomo.mensagem_erro);
         exit(0); // Finaliza execução do programa logo após imprimir a mensagem de erro
     }
-        
-    else // Quando identifica qualquer outro tipo de átomo
-        printf("%03d# %s\n", info_atomo.linha, msgAtomo[info_atomo.atomo]);
 
     return info_atomo; // Retorna informações do átomo para o analisador sintático
 

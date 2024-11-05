@@ -73,6 +73,16 @@ void verifica_semantica(bool checa) //Realiza a análise semântica dentro da fu
     }
 }
 
+int busca_tabela_simbolos(char var[]) //Função para retornar endereço da variável na tabela de símbolos
+{
+    for (int i = 0; i < MAX; i++) 
+    {
+        if(strcmp(tabela_de_simbolos[i], var) == 0)
+            return i;
+    }
+    return -1; //Se a variável não existe, retorna -1
+}
+
 void show_tabela() //Exibe tabela de símbolos
 {
     printf("\n\tTABELA DE SIMBOLOS\n");
@@ -82,6 +92,13 @@ void show_tabela() //Exibe tabela de símbolos
             break;
         printf("%-15s | Endereço: %d\n", tabela_de_simbolos[i], i);
     }
+}
+
+int rotulo = 1;
+
+int proximo_rotulo() //Função retorna o valor do rótulo a ser colocado no desvio
+{
+    return rotulo++;
 }
 
 //############################### ANALISADOR SINTÁTICO ###############################

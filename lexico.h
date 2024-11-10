@@ -29,7 +29,7 @@ InfoAtomo reconhece_numero()
         buffer++;
     }
 
-    if(*buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != '\r' && *buffer != '\t' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.') //Se após o número vier algum caractere inesperado:
+    if(*buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != '\r' && *buffer != '\t' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.' && *buffer != '+' && *buffer != '-' && *buffer != '*' && *buffer != '/') //Se após o número vier algum caractere inesperado:
     {
         info_atomo.atomo = ERRO; // Gera erro léxico
         strcpy(info_atomo.mensagem_erro, "Erro léxico: número inválido");
@@ -115,7 +115,7 @@ InfoAtomo reconhece_palavra(){
         tamanho++;
         buffer++;
     }
-    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != '\t' && *buffer != '\r' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.')
+    if(!islower(*buffer) && !isdigit(*buffer) && *buffer != '_' && *buffer != ' ' && *buffer != '\n' && *buffer != '\t' && *buffer != '\r' && *buffer != ',' && *buffer != ';' && *buffer != '(' && *buffer != ')' && *buffer != ':' && *buffer != '.' && *buffer != '+' && *buffer != '-' && *buffer != '*' && *buffer != '/')
     {
         info_atomo.atomo = ERRO; //Caso apareça algum caractere inesperado, gera erro léxico
         strcpy(info_atomo.mensagem_erro, "Erro léxico: identificador inválido!");

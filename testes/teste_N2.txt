@@ -1,0 +1,15 @@
+program exemplo1;
+integer n, k;
+integer f1, f2, f3;
+begin
+read(n);
+set f1 to 0b0;
+set f2 to 0b1;
+for k of 0b1 to n:
+begin
+set f3 to f1+f2;
+set f1 to f2;
+set f2 to f3
+end;
+write(n,f1)
+end.

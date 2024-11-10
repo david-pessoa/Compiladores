@@ -19,25 +19,28 @@ Atomo lookahead = INICIA_SINTATICO; //Inicia lookahead
 InfoAtomo info_atomo;
 
 //############################### ANALISADOR SEMÂNTICO ###############################
-bool confere_tabela(char var[]) //Retorna true se a variável está na tabela e false caso contrário
+int confere_tabela(char var[]) //Retorna true se a variável está na tabela e false caso contrário
 {
     for (int i = 0; i < MAX; i++) 
     {
         if(strcmp(tabela_de_simbolos[i], var) == 0)
-            return true;
+            return i;
     }
-    return false;
+    return -1;
 }
 
 
 bool add_na_tabela(char var[]) // retorna o resultado de confere_tabela() para o parâmetro passado e tenta adicionar a variável na tabela
 {   
-    bool result = confere_tabela(var);
-    if(!result)
+    int result = confere_tabela(var);
+    if(result < 0)
+    {
         strcpy(tabela_de_simbolos[index_tabela++], var);
+        return false;
+    }
+    else
+        return true;
     
-    return result;
-
 }
 
 void inicia_tabela() //Inicia a tabela de símbolos colocando cadeia vazia '\0' em todos os elementos do vetor
@@ -52,7 +55,7 @@ void inicia_tabela() //Inicia a tabela de símbolos colocando cadeia vazia '\0' 
 
 void verifica_semantica(bool checa) //Realiza a análise semântica dentro da função <lista_variavel>
 {
-    bool result;
+    int result;
     if(checa) // Se está dentro de <declaracao_de_variaveis>:
     {
         result = add_na_tabela(info_atomo.atributo_ID); //Tenta adicionar variável na tabela
@@ -65,11 +68,13 @@ void verifica_semantica(bool checa) //Realiza a análise semântica dentro da fu
     else //Se está no corpo do programa:
     {
         result = confere_tabela(info_atomo.atributo_ID); //Confere se a variável existe na tabela
-        if(!result) //Se ela não existir:
+        if(result < 0) //Se ela não existir:
         {
             printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
             exit(0);
         }
+        printf("LEIT\n");
+        printf("ARMZ %d\n", result);
     }
 }
 
@@ -145,7 +150,8 @@ void fator()
 {
     if(lookahead == IDENTIFICADOR) //Se lê identificador, consome identificador
     {    
-        printf("CRVL %s\n", info_atomo.atributo_ID);
+        int endereco = confere_tabela(info_atomo.atributo_ID);
+        printf("CRVL %d\n", endereco);
         consome(IDENTIFICADOR);
     }
 
@@ -303,13 +309,32 @@ void expressao(int i)
 void comando_repeticao() //Comando de laço for
 {
     consome(FOR);
+    int endereco = confere_tabela(info_atomo.atributo_ID);
     consome(IDENTIFICADOR); //Consome átomos
     consome(OF);
     expressao(0); //Chama expressao() para ler a expressão de condição do for
+    printf("ARMZ %d\n", endereco);
     consome(TO);
+
+    int L1 = proximo_rotulo();
+    int L2 = proximo_rotulo();
+    printf("L%d: NADA\n", L1);
+    printf("CRVL %d\n", endereco);
     expressao(0); //Chama expressao() para ler a expressão de condição do for
+
     consome(DOIS_PONTOS);
+    
+    printf("CMEG\n");
+    printf("DSVF L%d\n", L2);
+
     comando(); //Chama expressao() para ler o comando aninhado ao for
+
+    printf("CRVL %d\n", endereco);
+    printf("CRCT 1\n");
+    printf("SOMA\n");
+    printf("ARMZ %d\n", endereco);
+    printf("DSVS L%d\n", L1);
+    printf("L%d: NADA\n", L2);
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -335,6 +360,7 @@ void comando_saida(int i)
         consome(WRITE); //Consome átomos write e '('
         consome(ABRE_PARENTESES);
         expressao(0); //Chama expressao()
+        printf("IMPR\n");
         comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
@@ -342,6 +368,7 @@ void comando_saida(int i)
     {
         consome(VIRGULA); //Consome vírgula
         expressao(0); //Chama expressao()
+        printf("IMPR\n");
         comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
     
@@ -378,9 +405,11 @@ void comando_condicional()
 void comando_atribuicao()
 {
     consome(SET); //Consome átomos e lê expressão
+    int endereco = confere_tabela(info_atomo.atributo_ID);
     consome(IDENTIFICADOR);
     consome(TO);
     expressao(0);
+    printf("ARMZ %d\n", endereco);
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -502,6 +531,7 @@ void bloco()
         consome(COMENTARIO); //Consome comentário
 
     declaracao_de_variaveis();
+    printf("AMEM %d\n", index_tabela);
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -517,6 +547,7 @@ void programa()
 {
     consome(INICIA_SINTATICO); //Obtém átomo inicial
     inicia_tabela();
+    printf("INPP\n");
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -533,7 +564,8 @@ void programa()
 
         while(lookahead == COMENTARIO) //Verifica se há comentários
             consome(COMENTARIO); //Consome comentário
-    
+
+    printf("PARA\n");
     show_tabela();
 }
 #endif

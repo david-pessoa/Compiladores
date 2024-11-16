@@ -151,6 +151,11 @@ void fator()
     if(lookahead == IDENTIFICADOR) //Se lê identificador, consome identificador
     {    
         int endereco = confere_tabela(info_atomo.atributo_ID);
+        if(endereco < 0)
+        {
+            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+            exit(0);
+        }
         printf("CRVL %d\n", endereco);
         consome(IDENTIFICADOR);
     }
@@ -266,8 +271,22 @@ void expressao_relacional()
     //Se o próximo átomo é algum operador relacional
     if(lookahead == OP_MENOR || lookahead == OP_MENOR_IGUAL || lookahead == OP_IGUAL || lookahead == OP_DIV_IGUAL || lookahead == OP_MAIOR || lookahead == OP_MAIOR_IGUAL)
     {
+        Atomo operador = lookahead;
         op_relacional(); //Chama op_relacional()
         expressao_simples(0); //Chama expressao_simples()
+
+        if(operador == OP_MENOR)
+            printf("CMME\n");
+        else if(operador == OP_MENOR_IGUAL)
+            printf("CMEG\n");
+        else if(operador == OP_MAIOR_IGUAL)
+            printf("CMAG\n");
+        else if(operador == OP_IGUAL)
+            printf("CMIG\n");
+        else if(operador == OP_DIV_IGUAL)
+            printf("CMDG\n");
+        else if(operador == OP_MAIOR)
+            printf("CMMA\n");
     }
 }
 
@@ -310,6 +329,12 @@ void comando_repeticao() //Comando de laço for
 {
     consome(FOR);
     int endereco = confere_tabela(info_atomo.atributo_ID);
+    if(endereco < 0)
+    {
+            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+            exit(0);
+    }
+
     consome(IDENTIFICADOR); //Consome átomos
     consome(OF);
     expressao(0); //Chama expressao() para ler a expressão de condição do for
@@ -382,10 +407,12 @@ void comando_saida(int i)
 //<comando_condicional> ::= if <expressao> “:” <comando> [elif <comando>]
 void comando_condicional()
 {
+    int L1 = proximo_rotulo();
     if(lookahead == IF) //Se o próximo átomo é um if:
     {
         consome(IF); //Consome if, consome condição e dois pontos
         expressao(0);
+        printf("DSVF L%d\n", L1);
         consome(DOIS_PONTOS);
         comando(); // Chama comando()
     }
@@ -394,9 +421,16 @@ void comando_condicional()
 
     if(lookahead == ELIF) //Caso o if seja seguido de um elif:
     {
+        int L2 = proximo_rotulo();
+        printf("DSVS L%d\n", L2);
+        printf("L%d:  NADA\n", L1);
         consome(ELIF); // Consome elif e chama comando()
         comando();
+        printf("L%d:  NADA\n", L2);
     }
+    else
+        printf("L%d:  NADA\n", L1); //Caso não haja um ELIF
+
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
 }
@@ -406,6 +440,11 @@ void comando_atribuicao()
 {
     consome(SET); //Consome átomos e lê expressão
     int endereco = confere_tabela(info_atomo.atributo_ID);
+    if(endereco < 0)
+    {
+            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
+            exit(0);
+    }
     consome(IDENTIFICADOR);
     consome(TO);
     expressao(0);

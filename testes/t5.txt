@@ -1,4 +1,4 @@
 program t5;
 begin
-  write(a)
+  write(0b101)
 end.

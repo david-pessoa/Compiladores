@@ -27,3 +27,17 @@ Para cada não-terminal da gramática fornecida, criamos uma função. Por exemp
 É importante ressaltar que foi utilizada a recursão em funções que possuem alguma repetição de cadeia. Por isso, quando uma função chama um terminal que é seguido de um loop, como em: `<lista_variavel> ::= identificador { “,” identificador }`, é feita a contagem do número de recursões para conferir se está na primeira chamada (nível 0) ou num nível mais profundo na recursão (nível > 0). Assim é possível saber se o átomo esperado é o `identifcador` ou `,` no caso de `<lista_variavel>`
 
 ## Parte II
+
+Para a parte II desse projeto, criou-se um novo módulo: `semantico.h` para conter funções relacionadas à análise semântica do código. Além disso, modificou-se o arquivo já existente `sintatico.h` a fim de que fosse possível gerar o código MEPA.
+
+### Analisador Semântico (semantico.h)
+Para o analisador semântico, criamos 8 funções: `confere_tabela()`, `add_na_tabela()`, `inicia_tabela()`, `verifica_sematica()`, `verifica_semantica_outros()`, `show_tabela()`, `proximo_rotulo()` e `get_index_tabela()`.
+
+* `confere_tabela(char var[])`: recebe por parâmetro o nome de uma variável e confere se ela está presente na tabela de símbolos. Se sim, retorna seu respectivo índice, senão, retorna -1;
+* `add_na_tabela(char var[])`: também recebe por parâmetro o nome de uma variável para conferir se é possível adicioná-la na tabela de símbolos. Retorna `false` se consegue adicionar na tabela e `true` caso contrário;
+* `inicia_tabela()`: Essa função é chamada ao início do programa para criar a tabela de símbolos;
+* `verifica_sematica(bool checa, InfoAtomo info_atomo)`: A função recebe por parâmetro um valor booleano para verificar se ela está sendo chamada de dentro de `declaracao_de_variaveis()` ou `comando_entrada()` e o valor da variável `info_atomo` do módulo `sintatico.h`. Quando a função está sendo chamada de `declaracao_de_variaveis()`, tenta-se adicionar o valor de `info_atomo.atributo_ID`. Caso a variável já exista retorna erro. Se a função estiver sendo chamada de `comando_entrada()`, é conferido se `info_atomo.atributo_ID` está presente na tabela. Se estiver, gera o código intermediário respectivo ao comando de entrada. Caso contrário, retorna erro;
+* `verifica_semantica_outros(InfoAtomo info_atomo)`: Verifica a semântica para outros pontos no código após a declaração de variáveis, sem ser dentro de `comando_entrada()`. Portanto a função verifica se a variável já existe na tabela, se existir retorna erro, senão, retorna o endereço da variável na tabela de símbolos.
+* `show_tabela()`: Imprime a tabela de símbolos;
+* `proximo_rotulo()`: Retorna o próximo rótulo;
+* `get_tabela_size()`: Retorna o tamanho da tabela de símbolos.

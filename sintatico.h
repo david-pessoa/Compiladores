@@ -8,103 +8,14 @@
 #include <ctype.h>
 #include <math.h>
 #include "lexico.h"
+#include "semantico.h"
+#include "atomo.h"
 
 #ifndef LOOKAHEAD_H
 #define LOOKAHEAD_H
-#define MAX 20 //Máximo de variáveis suportado pela tabela de símbolos (1+a)-(3/1*9)
 
-char *tabela_de_simbolos[MAX]; //Cria tabela de símbolos
-int index_tabela = 0; //Inicializa indíce da tabela em 0
 Atomo lookahead = INICIA_SINTATICO; //Inicia lookahead
 InfoAtomo info_atomo;
-
-//############################### ANALISADOR SEMÂNTICO ###############################
-int confere_tabela(char var[]) //Retorna true se a variável está na tabela e false caso contrário
-{
-    for (int i = 0; i < MAX; i++) 
-    {
-        if(strcmp(tabela_de_simbolos[i], var) == 0)
-            return i;
-    }
-    return -1;
-}
-
-
-bool add_na_tabela(char var[]) // retorna o resultado de confere_tabela() para o parâmetro passado e tenta adicionar a variável na tabela
-{   
-    int result = confere_tabela(var);
-    if(result < 0)
-    {
-        strcpy(tabela_de_simbolos[index_tabela++], var);
-        return false;
-    }
-    else
-        return true;
-    
-}
-
-void inicia_tabela() //Inicia a tabela de símbolos colocando cadeia vazia '\0' em todos os elementos do vetor
-{
-    for (int i = 0; i < MAX; i++) {
-        tabela_de_simbolos[i] = malloc(15 * sizeof(char)); // Cada string pode ter até 49 caracteres + '\0'
-        if (tabela_de_simbolos[i] != NULL) {
-            memset(tabela_de_simbolos[i], '\0', 15); // Inicializa com '\0'
-        }
-    }
-}
-
-void verifica_semantica(bool checa) //Realiza a análise semântica dentro da função <lista_variavel>
-{
-    int result;
-    if(checa) // Se está dentro de <declaracao_de_variaveis>:
-    {
-        result = add_na_tabela(info_atomo.atributo_ID); //Tenta adicionar variável na tabela
-        if(result) //Se ela já existir:
-        {
-            printf("#%d Erro semântico: variável '%s' já foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-            exit(0);
-        }
-    }
-    else //Se está no corpo do programa:
-    {
-        result = confere_tabela(info_atomo.atributo_ID); //Confere se a variável existe na tabela
-        if(result < 0) //Se ela não existir:
-        {
-            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-            exit(0);
-        }
-        printf("LEIT\n");
-        printf("ARMZ %d\n", result);
-    }
-}
-
-int busca_tabela_simbolos(char var[]) //Função para retornar endereço da variável na tabela de símbolos
-{
-    for (int i = 0; i < MAX; i++) 
-    {
-        if(strcmp(tabela_de_simbolos[i], var) == 0)
-            return i;
-    }
-    return -1; //Se a variável não existe, retorna -1
-}
-
-void show_tabela() //Exibe tabela de símbolos
-{
-    printf("\n\tTABELA DE SIMBOLOS\n");
-    for (int i = 0; i < MAX; i++) 
-    {
-        if(strcmp(tabela_de_simbolos[i], "\0")  == 0)
-            break;
-        printf("%-15s | Endereço: %d\n", tabela_de_simbolos[i], i);
-    }
-}
-
-int rotulo = 1;
-
-int proximo_rotulo() //Função retorna o valor do rótulo a ser colocado no desvio
-{
-    return rotulo++;
-}
 
 //############################### ANALISADOR SINTÁTICO ###############################
 void consome(Atomo atomo){ //Função consome() verifica se o átomo esperado é o átomo obtido
@@ -150,18 +61,13 @@ void fator()
 {
     if(lookahead == IDENTIFICADOR) //Se lê identificador, consome identificador
     {    
-        int endereco = confere_tabela(info_atomo.atributo_ID);
-        if(endereco < 0)
-        {
-            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-            exit(0);
-        }
-        printf("CRVL %d\n", endereco);
+        int endereco = verifica_semantica_outros(info_atomo);
+        printf("CRVL %d\n", endereco); //Imprime o endereço da variável que está sendo carregada
         consome(IDENTIFICADOR);
     }
 
     else if(lookahead == NUMERO) //Se lê número, consome número
-    {   printf("CRCT %d\n", info_atomo.numero);
+    {   printf("CRCT %d\n", info_atomo.numero); //Imprime o valor do número carregado
         consome(NUMERO);
     }
     
@@ -275,17 +181,18 @@ void expressao_relacional()
         op_relacional(); //Chama op_relacional()
         expressao_simples(0); //Chama expressao_simples()
 
-        if(operador == OP_MENOR)
-            printf("CMME\n");
-        else if(operador == OP_MENOR_IGUAL)
+        //Indica que será feita a operação de...
+        if(operador == OP_MENOR) 
+            printf("CMME\n"); // menor (<)
+        else if(operador == OP_MENOR_IGUAL) //menor ou igual (<=)
             printf("CMEG\n");
-        else if(operador == OP_MAIOR_IGUAL)
+        else if(operador == OP_MAIOR_IGUAL) //maior ou igual (>=)
             printf("CMAG\n");
-        else if(operador == OP_IGUAL)
+        else if(operador == OP_IGUAL) //igual (=)
             printf("CMIG\n");
-        else if(operador == OP_DIV_IGUAL)
+        else if(operador == OP_DIV_IGUAL) // (/=)
             printf("CMDG\n");
-        else if(operador == OP_MAIOR)
+        else if(operador == OP_MAIOR) //maior (>)
             printf("CMMA\n");
     }
 }
@@ -328,38 +235,33 @@ void expressao(int i)
 void comando_repeticao() //Comando de laço for
 {
     consome(FOR);
-    int endereco = confere_tabela(info_atomo.atributo_ID);
-    if(endereco < 0)
-    {
-            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-            exit(0);
-    }
+    int endereco = verifica_semantica_outros(info_atomo); //Verifica se a variável já foi declarada
 
-    consome(IDENTIFICADOR); //Consome átomos
+    consome(IDENTIFICADOR); //Consome variável que será usado dentro do for (i)
     consome(OF);
-    expressao(0); //Chama expressao() para ler a expressão de condição do for
-    printf("ARMZ %d\n", endereco);
+    expressao(0); //Chama expressao() para retornar o valor de início da iteração
+    printf("ARMZ %d\n", endereco); //armazena o valor de início na variável i
     consome(TO);
 
     int L1 = proximo_rotulo();
     int L2 = proximo_rotulo();
-    printf("L%d: NADA\n", L1);
-    printf("CRVL %d\n", endereco);
-    expressao(0); //Chama expressao() para ler a expressão de condição do for
+    printf("L%d: NADA\n", L1); //Inicia loop
+    printf("CRVL %d\n", endereco); //Carrega valor da variável i
+    expressao(0); //Carrega valor de parada do for
 
     consome(DOIS_PONTOS);
     
-    printf("CMEG\n");
-    printf("DSVF L%d\n", L2);
+    printf("CMEG\n"); //Compara se a variável i é menor ou igual ao valor de parada
+    printf("DSVF L%d\n", L2); //Se não for, desvia
 
-    comando(); //Chama expressao() para ler o comando aninhado ao for
+    comando(); //Código aninhado ao for
 
-    printf("CRVL %d\n", endereco);
+    printf("CRVL %d\n", endereco); //Fim da iteração, incrementa i em um e salva novo valor
     printf("CRCT 1\n");
     printf("SOMA\n");
     printf("ARMZ %d\n", endereco);
-    printf("DSVS L%d\n", L1);
-    printf("L%d: NADA\n", L2);
+    printf("DSVS L%d\n", L1); //Volta ao início
+    printf("L%d: NADA\n", L2); //Sai do loop
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -384,7 +286,7 @@ void comando_saida(int i)
     {
         consome(WRITE); //Consome átomos write e '('
         consome(ABRE_PARENTESES);
-        expressao(0); //Chama expressao()
+        expressao(0); //Carrega valor a ser impresso
         printf("IMPR\n");
         comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
@@ -392,7 +294,7 @@ void comando_saida(int i)
     else if(lookahead == VIRGULA && i > 0) // Se o próximo átomo é vírgula
     {
         consome(VIRGULA); //Consome vírgula
-        expressao(0); //Chama expressao()
+        expressao(0); //Carrega valor a ser impresso
         printf("IMPR\n");
         comando_saida(i + 1); // Chama comando_saida() recursivamente para verificar se o comando de saída já encerrou ou não
     }
@@ -411,8 +313,8 @@ void comando_condicional()
     if(lookahead == IF) //Se o próximo átomo é um if:
     {
         consome(IF); //Consome if, consome condição e dois pontos
-        expressao(0);
-        printf("DSVF L%d\n", L1);
+        expressao(0); //Mostra condição do loop
+        printf("DSVF L%d\n", L1); //Se condição for falsa, não executa o if
         consome(DOIS_PONTOS);
         comando(); // Chama comando()
     }
@@ -422,11 +324,11 @@ void comando_condicional()
     if(lookahead == ELIF) //Caso o if seja seguido de um elif:
     {
         int L2 = proximo_rotulo();
-        printf("DSVS L%d\n", L2);
-        printf("L%d:  NADA\n", L1);
+        printf("DSVS L%d\n", L2); //Adiciona fim ao bloco if, para não invadir o elif
+        printf("L%d:  NADA\n", L1); //Inicia elif
         consome(ELIF); // Consome elif e chama comando()
         comando();
-        printf("L%d:  NADA\n", L2);
+        printf("L%d:  NADA\n", L2); // Sai do elif
     }
     else
         printf("L%d:  NADA\n", L1); //Caso não haja um ELIF
@@ -439,15 +341,10 @@ void comando_condicional()
 void comando_atribuicao()
 {
     consome(SET); //Consome átomos e lê expressão
-    int endereco = confere_tabela(info_atomo.atributo_ID);
-    if(endereco < 0)
-    {
-            printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
-            exit(0);
-    }
+    int endereco = verifica_semantica_outros(info_atomo);
     consome(IDENTIFICADOR);
     consome(TO);
-    expressao(0);
+    expressao(0); //Carrega valor a ser atribuído a variável
     printf("ARMZ %d\n", endereco);
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
@@ -517,7 +414,7 @@ void lista_variavel(int i, bool checa) //checa == true se está em <declaracao_d
 {
     if(i == 0)
     {
-        verifica_semantica(checa); //Realiza análise semântica
+        verifica_semantica(checa, info_atomo); //Realiza análise semântica
         consome(IDENTIFICADOR);
         lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
@@ -525,7 +422,7 @@ void lista_variavel(int i, bool checa) //checa == true se está em <declaracao_d
     else if(lookahead == VIRGULA && i > 0) //Se o próximo átomo é ',': consome a ',' e o identificador seguinte
     {
         consome(VIRGULA);
-        verifica_semantica(checa); //Realiza análise semântica
+        verifica_semantica(checa, info_atomo); //Realiza análise semântica
         consome(IDENTIFICADOR);
         lista_variavel(i + 1, checa); //Chama lista_variavel() recursivamente para verificar se a lista de variáveis acabou ou não
     }
@@ -570,7 +467,7 @@ void bloco()
         consome(COMENTARIO); //Consome comentário
 
     declaracao_de_variaveis();
-    printf("AMEM %d\n", index_tabela);
+    printf("AMEM %d\n", get_tabela_size()); //Aloca memória proporcional a quantidade de variáveis a serem usadas no programa
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -585,8 +482,8 @@ void bloco()
 void programa()
 {
     consome(INICIA_SINTATICO); //Obtém átomo inicial
-    inicia_tabela();
-    printf("INPP\n");
+    inicia_tabela(); //Cria a tabela de símbolos
+    printf("INPP\n"); //Inicia programa
 
     while(lookahead == COMENTARIO) //Verifica se há comentários
         consome(COMENTARIO); //Consome comentário
@@ -604,7 +501,7 @@ void programa()
         while(lookahead == COMENTARIO) //Verifica se há comentários
             consome(COMENTARIO); //Consome comentário
 
-    printf("PARA\n");
-    show_tabela();
+    printf("PARA\n"); //Exibe encerramento do programa
+    show_tabela(); //Exibe tabela de símbolos
 }
 #endif

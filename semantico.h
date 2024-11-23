@@ -16,7 +16,7 @@ char *tabela_de_simbolos[MAX]; //Cria tabela de símbolos
 int index_tabela = 0; //Inicializa indíce da tabela em 0
 
 //############################### ANALISADOR SEMÂNTICO ###############################
-int confere_tabela(char var[]) //Retorna o índice da variável na tabela, se ela está na tabela e -1 caso contrário
+int busca_tabela_simbolos(char var[]) //Retorna o índice da variável na tabela, se ela está na tabela e -1 caso contrário
 {
     for (int i = 0; i < MAX; i++) 
     {
@@ -29,7 +29,7 @@ int confere_tabela(char var[]) //Retorna o índice da variável na tabela, se el
 
 bool add_na_tabela(char var[]) // Chama a função confere_tabela() para conferir se a variável já foi declarada para verificar se é possível adicioná-la na tabela
 {   
-    int result = confere_tabela(var); 
+    int result = busca_tabela_simbolos(var); 
     if(result < 0)
     {
         strcpy(tabela_de_simbolos[index_tabela++], var);
@@ -52,7 +52,7 @@ void inicia_tabela() //Inicia a tabela de símbolos colocando cadeia vazia '\0' 
 
 int verifica_semantica_outros(InfoAtomo info_atomo) //Verifica se a variável em info_atomo.atributo_ID está presente na tabela
 {
-    int result = confere_tabela(info_atomo.atributo_ID); 
+    int result = busca_tabela_simbolos(info_atomo.atributo_ID); 
     if(result < 0) //Se o resultado for -1, não está, então retorna erro.
     {
         printf("#%d Erro semântico: variável '%s' não foi declarada anteriormente!\n", info_atomo.linha, info_atomo.atributo_ID);
